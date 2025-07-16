@@ -296,6 +296,7 @@ def test_unicode_content(mcp_server):
 
     # Give a small delay to ensure clipboard is set
     import time
+
     time.sleep(0.1)
 
     # Verify Unicode content is preserved

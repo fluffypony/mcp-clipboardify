@@ -195,10 +195,10 @@ class TestMacOSClipboard:
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["ascii"]
             mock_paste.return_value = test_text
-            
+
             set_clipboard(test_text)
             result = get_clipboard()
-            
+
             mock_copy.assert_called_once_with(test_text)
             mock_paste.assert_called_once()
             assert result == test_text
@@ -210,10 +210,10 @@ class TestMacOSClipboard:
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["unicode"]
             mock_paste.return_value = test_text
-            
+
             set_clipboard(test_text)
             result = get_clipboard()
-            
+
             mock_copy.assert_called_once_with(test_text)
             mock_paste.assert_called_once()
             assert result == test_text
@@ -225,10 +225,10 @@ class TestMacOSClipboard:
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["rtf_fallback"]
             mock_paste.return_value = test_text
-            
+
             set_clipboard(test_text)
             result = get_clipboard()
-            
+
             mock_copy.assert_called_once_with(test_text)
             mock_paste.assert_called_once()
             # Should get plain text even if rich text was set

@@ -1,7 +1,5 @@
 """Global pytest configuration for clipboard tests."""
 
-import pytest
-
 
 def pytest_configure(config):
     """Configure pytest to handle serial markers correctly."""
