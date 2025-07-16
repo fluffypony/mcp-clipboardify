@@ -96,7 +96,7 @@ class TestParseJsonRpcMessage:
     def test_parse_non_object(self):
         """Test parsing JSON array instead of object."""
         data = '["not", "an", "object"]'
-        with pytest.raises(ValueError, match="Invalid request: must be JSON object"):
+        with pytest.raises(ValueError, match="Invalid request: batch items must be JSON objects"):
             parse_json_rpc_message(data)
 
     def test_parse_missing_jsonrpc(self):

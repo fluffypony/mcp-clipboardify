@@ -24,6 +24,44 @@ class MCPServer:
         """Initialize the MCP server."""
         self.mcp_handler = MCPHandler()
     
+    # Expose MCPHandler properties for backwards compatibility with tests
+    @property
+    def initialized(self):
+        """Check if server is initialized."""
+        return self.mcp_handler.initialized
+    
+    @initialized.setter
+    def initialized(self, value):
+        """Set initialization state."""
+        self.mcp_handler.initialized = value
+    
+    @property
+    def server_info(self):
+        """Get server info."""
+        return self.mcp_handler.get_server_info()
+    
+    @property
+    def capabilities(self):
+        """Get server capabilities."""
+        return self.mcp_handler.get_server_capabilities()
+    
+    # Expose handler methods for backwards compatibility
+    def handle_initialize(self, request: JsonRpcRequest) -> str:
+        """Handle initialize request."""
+        return self.mcp_handler.handle_initialize(request)
+    
+    def handle_tools_list(self, request: JsonRpcRequest) -> str:
+        """Handle tools/list request."""
+        return self.mcp_handler.handle_tools_list(request)
+    
+    def handle_tools_call(self, request: JsonRpcRequest) -> str:
+        """Handle tools/call request."""
+        return self.mcp_handler.handle_tools_call(request)
+    
+    def handle_ping(self, request: JsonRpcRequest) -> Optional[str]:
+        """Handle ping notification."""
+        return self.mcp_handler.handle_ping(request)
+    
     def handle_request(self, request: JsonRpcRequest) -> Optional[str]:
         """
         Handle a JSON-RPC request and return the appropriate response.

@@ -134,11 +134,11 @@ class TestMCPServer:
         assert "error" in response
         assert response["error"]["code"] == ErrorCodes.INVALID_PARAMS
 
-    @patch('mcp_clipboard_server.server.execute_tool')
-    def test_handle_tools_call_success(self, mock_execute):
+    @patch('mcp_clipboard_server._mcp_handler.get_clipboard')
+    def test_handle_tools_call_success(self, mock_get_clipboard):
         """Test successful tools/call."""
         self.server.initialized = True
-        mock_execute.return_value = {"content": [{"type": "text", "text": "test"}]}
+        mock_get_clipboard.return_value = "test content"
         
         request = JsonRpcRequest(
             jsonrpc="2.0",
@@ -152,13 +152,14 @@ class TestMCPServer:
         
         assert "error" not in response
         assert "result" in response
-        mock_execute.assert_called_once_with("get_clipboard", {})
+        mock_get_clipboard.assert_called_once()
 
-    @patch('mcp_clipboard_server.server.execute_tool')
-    def test_handle_tools_call_tool_error(self, mock_execute):
+    @patch('mcp_clipboard_server._mcp_handler.get_clipboard')
+    def test_handle_tools_call_tool_error(self, mock_get_clipboard):
         """Test tools/call with tool execution error."""
         self.server.initialized = True
-        mock_execute.side_effect = ValueError("Invalid parameters")
+        from mcp_clipboard_server.clipboard import ClipboardError
+        mock_get_clipboard.side_effect = ClipboardError("Clipboard error")
         
         request = JsonRpcRequest(
             jsonrpc="2.0",
@@ -171,7 +172,7 @@ class TestMCPServer:
         response = json.loads(response_json)
         
         assert "error" in response
-        assert response["error"]["code"] == ErrorCodes.INVALID_PARAMS
+        assert response["error"]["code"] == -32001  # CLIPBOARD_ERROR
 
     def test_handle_ping(self):
         """Test ping notification handling."""
@@ -234,8 +235,8 @@ class TestMCPServer:
         assert len(tools) == 2
         
         # 3. Call tool (mocked)
-        with patch('mcp_clipboard_server.server.execute_tool') as mock_execute:
-            mock_execute.return_value = {"content": [{"type": "text", "text": "clipboard content"}]}
+        with patch('mcp_clipboard_server._mcp_handler.get_clipboard') as mock_get_clipboard:
+            mock_get_clipboard.return_value = "clipboard content"
             
             call_request = JsonRpcRequest(
                 jsonrpc="2.0",
