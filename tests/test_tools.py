@@ -4,9 +4,10 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from mcp_clipboard_server.tools import (
-    TOOLS, list_tools, validate_tool_params, execute_tool, 
+    list_tools, validate_tool_params, execute_tool, 
     get_tool_error_code
 )
+from mcp_clipboard_server.tool_schemas import get_all_tool_definitions
 from mcp_clipboard_server.clipboard import ClipboardError
 from mcp_clipboard_server.protocol import ErrorCodes
 
@@ -16,12 +17,14 @@ class TestToolDefinitions:
 
     def test_tools_defined(self):
         """Test that both required tools are defined."""
-        assert "get_clipboard" in TOOLS
-        assert "set_clipboard" in TOOLS
+        tool_definitions = get_all_tool_definitions()
+        assert "get_clipboard" in tool_definitions
+        assert "set_clipboard" in tool_definitions
 
     def test_get_clipboard_schema(self):
         """Test get_clipboard tool schema."""
-        tool = TOOLS["get_clipboard"]
+        tool_definitions = get_all_tool_definitions()
+        tool = tool_definitions["get_clipboard"]
         assert tool["name"] == "get_clipboard"
         assert "description" in tool
         assert tool["inputSchema"]["type"] == "object"
@@ -29,7 +32,8 @@ class TestToolDefinitions:
 
     def test_set_clipboard_schema(self):
         """Test set_clipboard tool schema."""
-        tool = TOOLS["set_clipboard"]
+        tool_definitions = get_all_tool_definitions()
+        tool = tool_definitions["set_clipboard"]
         assert tool["name"] == "set_clipboard"
         assert "description" in tool
         assert "text" in tool["inputSchema"]["properties"]

@@ -5,38 +5,10 @@ from typing import Any, Dict, List
 
 from .clipboard import get_clipboard, set_clipboard, ClipboardError
 from .protocol import ErrorCodes
+from .tool_schemas import get_all_tool_definitions, validate_tool_exists, get_tool_schema
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
-# Tool definitions following MCP schema
-TOOLS = {
-    "get_clipboard": {
-        "name": "get_clipboard",
-        "description": "Get the current text content from the system clipboard",
-        "inputSchema": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": False
-        }
-    },
-    "set_clipboard": {
-        "name": "set_clipboard", 
-        "description": "Set the system clipboard to the provided text content",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "text": {
-                    "type": "string",
-                    "description": "The text content to copy to the clipboard",
-                    "maxLength": 1048576  # 1MB limit
-                }
-            },
-            "required": ["text"],
-            "additionalProperties": False
-        }
-    }
-}
 
 
 def list_tools() -> Dict[str, Any]:
@@ -46,7 +18,8 @@ def list_tools() -> Dict[str, Any]:
     Returns:
         Dict containing the tools array.
     """
-    return {"tools": list(TOOLS.values())}
+    tool_definitions = get_all_tool_definitions()
+    return {"tools": list(tool_definitions.values())}
 
 
 def validate_tool_params(tool_name: str, params: Dict[str, Any]) -> None:
@@ -60,10 +33,10 @@ def validate_tool_params(tool_name: str, params: Dict[str, Any]) -> None:
     Raises:
         ValueError: If parameters are invalid.
     """
-    if tool_name not in TOOLS:
+    if not validate_tool_exists(tool_name):
         raise ValueError(f"Unknown tool: {tool_name}")
     
-    tool_schema = TOOLS[tool_name]["inputSchema"]
+    tool_schema = get_tool_schema(tool_name)
     
     if tool_name == "get_clipboard":
         # No parameters required
