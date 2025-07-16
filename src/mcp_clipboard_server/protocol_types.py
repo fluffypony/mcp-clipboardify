@@ -50,6 +50,7 @@ class ServerCapabilities(TypedDict, total=False):
 
 class InitializeResult(TypedDict):
     """Result of initialize request."""
+    protocolVersion: str
     serverInfo: ServerInfo
     capabilities: ServerCapabilities
 

@@ -80,6 +80,7 @@ class MCPHandler:
         
         # Build initialize result
         result: InitializeResult = {
+            "protocolVersion": "2024-11-05",  # Current MCP protocol version
             "serverInfo": self.get_server_info(),
             "capabilities": self.get_server_capabilities()
         }

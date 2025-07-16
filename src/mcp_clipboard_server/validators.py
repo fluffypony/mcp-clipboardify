@@ -49,7 +49,7 @@ def validate_text_size(text: str, max_bytes: int = 1048576) -> None:
         raise ValidationException([
             ValidationError(
                 "text", 
-                f"Text size ({byte_size} bytes) exceeds limit",
+                "Text exceeds 1MB limit",
                 limit=max_bytes
             )
         ])
@@ -161,7 +161,7 @@ def validate_clipboard_text(text: str) -> None:
     # Check type first
     if not isinstance(text, str):
         raise ValidationException([
-            ValidationError("text", "Must be a string")
+            ValidationError("text", "Text must be a string")
         ])
     
     # Check size limit (1MB)

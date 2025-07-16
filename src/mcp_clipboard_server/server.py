@@ -100,8 +100,6 @@ def run_server(shutdown_event: threading.Event | None = None):
             
             # Parse and handle the request - wrap in comprehensive error handling
             try:
-                # Enhanced JSON parsing with validation
-                parsed_data = safe_json_parse(line)
                 request = parse_json_rpc_message(line)
                 response = server.handle_request(request)
                 
@@ -111,7 +109,7 @@ def run_server(shutdown_event: threading.Event | None = None):
                     sys.stdout.flush()  # Critical for STDIO communication
                     
             except ValidationException as e:
-                # Enhanced validation error handling
+                # Enhanced validation error handling (for tool params, etc.)
                 logger.error(f"Validation error: {e}")
                 try:
                     error_response = create_error_response(
