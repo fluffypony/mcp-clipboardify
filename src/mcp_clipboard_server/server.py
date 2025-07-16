@@ -12,6 +12,7 @@ from .protocol import (
 from .mcp_handler import MCPHandler
 from .logging_config import setup_logging, log_request, log_response
 from .errors import create_error_response_for_exception
+from .validators import safe_json_parse, ValidationException
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,8 @@ def run_server(shutdown_event: threading.Event | None = None):
             
             # Parse and handle the request - wrap in comprehensive error handling
             try:
+                # Enhanced JSON parsing with validation
+                parsed_data = safe_json_parse(line)
                 request = parse_json_rpc_message(line)
                 response = server.handle_request(request)
                 
@@ -107,8 +110,20 @@ def run_server(shutdown_event: threading.Event | None = None):
                     sys.stdout.write(response + '\n')
                     sys.stdout.flush()  # Critical for STDIO communication
                     
+            except ValidationException as e:
+                # Enhanced validation error handling
+                logger.error(f"Validation error: {e}")
+                try:
+                    error_response = create_error_response(
+                        None, ErrorCodes.INVALID_PARAMS, str(e)
+                    )
+                    sys.stdout.write(error_response + '\n')
+                    sys.stdout.flush()
+                except Exception as write_error:
+                    logger.error(f"Failed to send validation error response: {write_error}")
+                    
             except ValueError as e:
-                # JSON parsing or validation error - recoverable
+                # JSON parsing or other validation error - recoverable
                 logger.error(f"Parse error: {e}")
                 try:
                     error_response = create_error_response(

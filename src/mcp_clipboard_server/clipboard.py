@@ -2,6 +2,7 @@
 
 import pyperclip
 from typing import Optional
+from .validators import validate_clipboard_text, ValidationException
 
 
 class ClipboardError(Exception):
@@ -35,14 +36,14 @@ def set_clipboard(text: str) -> None:
         
     Raises:
         ClipboardError: If clipboard access fails.
-        ValueError: If text exceeds 1MB limit.
+        ValueError: If text validation fails.
     """
-    if not isinstance(text, str):
-        raise ValueError("Text must be a string")
-    
-    # Enforce 1MB limit to prevent memory issues
-    if len(text.encode('utf-8')) > 1024 * 1024:
-        raise ValueError("Text exceeds 1MB limit")
+    try:
+        # Use enhanced validation
+        validate_clipboard_text(text)
+    except ValidationException as e:
+        # Convert ValidationException to ValueError for backward compatibility
+        raise ValueError(str(e)) from e
     
     try:
         pyperclip.copy(text)
