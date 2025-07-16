@@ -1,6 +1,6 @@
 """JSON Schema definitions for MCP tool input parameters."""
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 from .protocol_types import ToolDefinition
 
 
@@ -83,7 +83,7 @@ def validate_tool_exists(tool_name: str) -> bool:
     return tool_name in TOOL_DEFINITIONS
 
 
-def get_tool_names() -> list[str]:
+def get_tool_names() -> List[str]:
     """
     Get list of all available tool names.
     

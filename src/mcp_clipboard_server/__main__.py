@@ -3,31 +3,25 @@
 import sys
 import logging
 from .server import run_server
+from .logging_config import setup_logging, configure_third_party_loggers
 
 
 def main():
     """Main entry point for the MCP clipboard server."""
-    # Configure logging level from environment if needed
-    import os
-    log_level = os.environ.get('MCP_LOG_LEVEL', 'INFO').upper()
+    # Setup structured logging
+    setup_logging()
+    configure_third_party_loggers()
     
-    try:
-        numeric_level = getattr(logging, log_level)
-    except AttributeError:
-        numeric_level = logging.INFO
-    
-    logging.basicConfig(
-        level=numeric_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        stream=sys.stderr  # Log to stderr to keep stdout clean for JSON-RPC
-    )
+    logger = logging.getLogger(__name__)
+    logger.info("Starting MCP clipboard server")
     
     try:
         run_server()
     except KeyboardInterrupt:
+        logger.info("Received interrupt signal, shutting down")
         sys.exit(0)
     except Exception as e:
-        logging.error(f"Fatal error: {e}")
+        logger.error(f"Fatal error: {e}", exc_info=True)
         sys.exit(1)
 
 

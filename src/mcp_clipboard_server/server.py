@@ -8,10 +8,10 @@ from .protocol import (
     parse_json_rpc_message, create_success_response, create_error_response,
     ErrorCodes, JsonRpcRequest
 )
-from .tools import list_tools, execute_tool, get_tool_error_code
+from .mcp_handler import MCPHandler
+from .logging_config import setup_logging, log_request, log_response
+from .errors import create_error_response_for_exception
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -20,114 +20,7 @@ class MCPServer:
     
     def __init__(self):
         """Initialize the MCP server."""
-        self.initialized = False
-        self.server_info = {
-            "name": "mcp-clipboard-server",
-            "version": "0.1.0"
-        }
-        self.capabilities = {
-            "tools": {}
-        }
-    
-    def handle_initialize(self, request: JsonRpcRequest) -> str:
-        """
-        Handle MCP initialize request.
-        
-        Args:
-            request: The JSON-RPC request.
-            
-        Returns:
-            JSON response string.
-        """
-        logger.info("Initializing MCP server")
-        
-        # Extract client info if provided
-        client_info = {}
-        if request.params:
-            client_info = request.params.get("clientInfo", {})
-            logger.info(f"Client info: {client_info}")
-        
-        self.initialized = True
-        
-        result = {
-            "serverInfo": self.server_info,
-            "capabilities": self.capabilities
-        }
-        
-        return create_success_response(request.id, result)
-    
-    def handle_tools_list(self, request: JsonRpcRequest) -> str:
-        """
-        Handle tools/list request.
-        
-        Args:
-            request: The JSON-RPC request.
-            
-        Returns:
-            JSON response string.
-        """
-        if not self.initialized:
-            return create_error_response(
-                request.id, ErrorCodes.SERVER_ERROR, 
-                "Server not initialized"
-            )
-        
-        logger.debug("Listing available tools")
-        result = list_tools()
-        return create_success_response(request.id, result)
-    
-    def handle_tools_call(self, request: JsonRpcRequest) -> str:
-        """
-        Handle tools/call request.
-        
-        Args:
-            request: The JSON-RPC request.
-            
-        Returns:
-            JSON response string.
-        """
-        if not self.initialized:
-            return create_error_response(
-                request.id, ErrorCodes.SERVER_ERROR,
-                "Server not initialized"
-            )
-        
-        if not request.params:
-            return create_error_response(
-                request.id, ErrorCodes.INVALID_PARAMS,
-                "Missing parameters for tool call"
-            )
-        
-        tool_name = request.params.get("name")
-        arguments = request.params.get("arguments", {})
-        
-        if not tool_name:
-            return create_error_response(
-                request.id, ErrorCodes.INVALID_PARAMS,
-                "Missing tool name"
-            )
-        
-        try:
-            result = execute_tool(tool_name, arguments)
-            return create_success_response(request.id, result)
-        except Exception as e:
-            error_code = get_tool_error_code(e)
-            return create_error_response(
-                request.id, error_code, str(e)
-            )
-    
-    def handle_ping(self, request: JsonRpcRequest) -> Optional[str]:
-        """
-        Handle ping notification.
-        
-        Args:
-            request: The JSON-RPC request.
-            
-        Returns:
-            None for notifications (no response).
-        """
-        logger.debug("Received ping")
-        return None  # Notifications don't get responses
+        self.mcp_handler = MCPHandler()
     
     def handle_request(self, request: JsonRpcRequest) -> Optional[str]:
         """
@@ -139,28 +32,26 @@ class MCPServer:
         Returns:
             JSON response string, or None for notifications.
         """
-        method = request.method
+        # Log the incoming request
+        log_request(logger, request.method, request.params, request.id)
         
-        # Handle MCP methods
-        if method == "initialize":
-            return self.handle_initialize(request)
-        elif method == "tools/list":
-            return self.handle_tools_list(request)
-        elif method == "tools/call":
-            return self.handle_tools_call(request)
-        elif method == "$/ping":
-            return self.handle_ping(request)
-        else:
-            # Unknown method - return error if it's a request (has ID)
-            if request.id is not None:
-                return create_error_response(
-                    request.id, ErrorCodes.METHOD_NOT_FOUND,
-                    f"Method not found: {method}"
-                )
-            else:
-                # Ignore unknown notifications
-                logger.debug(f"Ignoring unknown notification: {method}")
-                return None
+        try:
+            # Delegate to MCP handler
+            response = self.mcp_handler.handle_request(request)
+            
+            # Log successful response
+            if response is not None:
+                log_response(logger, request.method, True, request.id)
+            
+            return response
+            
+        except Exception as e:
+            # Log error response
+            log_response(logger, request.method, False, request.id, 
+                        getattr(e, 'error_code', ErrorCodes.INTERNAL_ERROR))
+            
+            # Create error response for exception
+            return create_error_response_for_exception(request.id, e)
 
 
 def run_server():
@@ -169,6 +60,9 @@ def run_server():
     
     Reads JSON-RPC messages from stdin and writes responses to stdout.
     """
+    # Setup logging first
+    setup_logging()
+    
     server = MCPServer()
     logger.info("Starting MCP clipboard server")
     
