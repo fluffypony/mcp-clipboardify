@@ -177,7 +177,8 @@ class TestMCPServer:
         """Test ping notification handling."""
         request = JsonRpcRequest(
             jsonrpc="2.0",
-            method="$/ping"
+            method="$/ping",
+            id=None
         )
         
         response = self.server.handle_ping(request)
@@ -201,7 +202,8 @@ class TestMCPServer:
         """Test unknown notification (should be ignored)."""
         request = JsonRpcRequest(
             jsonrpc="2.0",
-            method="unknown/notification"
+            method="unknown/notification",
+            id=None
         )
         
         response = self.server.handle_request(request)
