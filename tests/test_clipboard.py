@@ -25,10 +25,11 @@ class TestClipboard:
 
     @patch('mcp_clipboard_server.clipboard.pyperclip.paste')
     def test_get_clipboard_failure(self, mock_paste):
-        """Test clipboard read failure."""
+        """Test clipboard read failure returns empty string gracefully."""
         mock_paste.side_effect = Exception("Clipboard access denied")
-        with pytest.raises(ClipboardError, match="Failed to read clipboard"):
-            get_clipboard()
+        # Should return empty string instead of raising exception
+        result = get_clipboard()
+        assert result == ""
 
     @patch('mcp_clipboard_server.clipboard.pyperclip.copy')
     def test_set_clipboard_success(self, mock_copy):

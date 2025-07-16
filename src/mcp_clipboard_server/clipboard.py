@@ -43,7 +43,15 @@ def _get_platform_guidance(error_msg: str) -> str:
     """Get platform-specific guidance for clipboard errors."""
     platform_info = _get_platform_info()
     
-    if "Linux" in platform_info:
+    # Check WSL first since it contains "Linux" but needs special handling
+    if "WSL" in platform_info:
+        return (
+            "WSL clipboard access may be limited. Try: "
+            "1. Use WSL2 with Windows 10 build 19041+ "
+            "2. Install wslu package for clip.exe integration "
+            "3. Use Windows Terminal or enable clipboard sharing"
+        )
+    elif "Linux" in platform_info:
         if "headless" in platform_info:
             return (
                 "Clipboard access requires a display server. "
@@ -61,13 +69,6 @@ def _get_platform_guidance(error_msg: str) -> str:
                 "No display available. Ensure DISPLAY environment variable is set "
                 "or run in a desktop environment."
             )
-    elif "WSL" in platform_info:
-        return (
-            "WSL clipboard access may be limited. Try: "
-            "1. Use WSL2 with Windows 10 build 19041+ "
-            "2. Install wslu package for clip.exe integration "
-            "3. Use Windows Terminal or enable clipboard sharing"
-        )
     elif "macOS" in platform_info:
         return (
             "macOS clipboard access failed. This may be due to: "
