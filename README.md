@@ -6,6 +6,17 @@ A [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.io/) server t
 [![Python Support](https://img.shields.io/pypi/pyversions/mcp-clipboardify.svg)](https://pypi.org/project/mcp-clipboardify/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 📚 Quick Navigation
+
+- [🚀 Quick Start](#-quick-start) - Get up and running in minutes
+- [✨ Features](#-features) - Full feature overview
+- [📋 Tools](#-tools) - Available clipboard operations
+- [🔧 Usage Examples](#-usage-examples) - JSON-RPC protocol examples
+- [🏗️ Installation & Setup](#-installation--setup) - Platform-specific instructions
+- [🔍 Troubleshooting](#-troubleshooting) - Platform support and common issues
+- [📖 Technical Reference](#-protocol-details--technical-reference) - Protocol details
+- [🤝 Contributing](#-contributing) - Development and contribution guidelines
+
 ## 🚀 Quick Start
 
 Install the server:
@@ -446,7 +457,7 @@ curl -sSL https://raw.githubusercontent.com/fluffypony/mcp-clipboardify/main/scr
 python -c "from scripts.verify_installation import InstallationVerifier; InstallationVerifier().run_all_tests()"
 ```
 
-## 📖 Protocol Details
+## 📖 Protocol Details & Technical Reference
 
 ### MCP Compliance
 
@@ -478,7 +489,7 @@ The server returns standard JSON-RPC 2.0 error codes:
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Development Guide](docs/development_guide.md) for contributing guidelines and workflow details.
 
 ### Development Workflow
 
