@@ -23,9 +23,9 @@ def clear_clipboard():
         set_clipboard("")
     except (ClipboardError, Exception):
         pass  # Ignore errors during cleanup
-    
+
     yield
-    
+
     # Clear clipboard after test
     try:
         set_clipboard("")

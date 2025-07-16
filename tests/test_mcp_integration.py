@@ -28,6 +28,7 @@ class MCPIntegrationTest(unittest.TestCase):
             self.server_process.terminate()
             # Give the process a moment to terminate gracefully
             import time
+
             time.sleep(0.1)
             if self.server_process.returncode is None:
                 self.server_process.kill()
