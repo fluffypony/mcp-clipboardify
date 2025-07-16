@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+import pytest
 import sys
 import unittest
 from typing import Any, Dict
@@ -167,6 +168,7 @@ class MCPIntegrationTest(unittest.TestCase):
         self.assertIn("get_clipboard", tool_names)
         self.assertIn("set_clipboard", tool_names)
 
+    @pytest.mark.serial
     async def test_clipboard_operations(self):
         """Test clipboard get and set operations."""
         reader, writer = await self.start_server()
@@ -209,6 +211,7 @@ class MCPIntegrationTest(unittest.TestCase):
         self.assertEqual(content[0]["type"], "text")
         self.assertEqual(content[0]["text"], self.test_data["short_text"])
 
+    @pytest.mark.serial
     async def test_unicode_content(self):
         """Test clipboard operations with Unicode content."""
         reader, writer = await self.start_server()

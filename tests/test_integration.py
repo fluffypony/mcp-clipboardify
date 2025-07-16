@@ -5,6 +5,7 @@ import subprocess
 import sys
 import time
 import pyperclip
+import pytest
 from typing import Dict, Any, Optional
 
 
@@ -135,6 +136,7 @@ def test_mcp_handshake():
         assert "set_clipboard" in tool_names
 
 
+@pytest.mark.serial
 def test_clipboard_operations():
     """Test actual clipboard read/write operations."""
     test_text = "Integration test content 🚀"
@@ -291,6 +293,7 @@ def test_notification_handling():
             assert "result" in response
 
 
+@pytest.mark.serial
 def test_unicode_clipboard_content():
     """Test handling of Unicode content in clipboard."""
     unicode_text = "Hello 🌍 こんにちは 🚀 مرحبا"

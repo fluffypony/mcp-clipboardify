@@ -155,6 +155,7 @@ class TestPlatformGuidance:
 class TestWindowsClipboard:
     """Test clipboard operations on Windows."""
 
+    @pytest.mark.serial
     def test_windows_ascii_content(self):
         """Test ASCII content on Windows."""
         if platform.system() == "Windows":
@@ -163,6 +164,7 @@ class TestWindowsClipboard:
             result = get_clipboard()
             assert result == test_text
 
+    @pytest.mark.serial
     def test_windows_unicode_content(self):
         """Test Unicode content on Windows."""
         if platform.system() == "Windows":
@@ -171,6 +173,7 @@ class TestWindowsClipboard:
             result = get_clipboard()
             assert result == test_text
 
+    @pytest.mark.serial
     def test_windows_crlf_endings(self):
         """Test CRLF line endings on Windows."""
         if platform.system() == "Windows":
@@ -185,37 +188,59 @@ class TestWindowsClipboard:
 class TestMacOSClipboard:
     """Test clipboard operations on macOS."""
 
-    def test_macos_ascii_content(self):
+    @patch("mcp_clipboard_server.clipboard.pyperclip.copy")
+    @patch("mcp_clipboard_server.clipboard.pyperclip.paste")
+    def test_macos_ascii_content(self, mock_paste, mock_copy):
         """Test ASCII content on macOS."""
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["ascii"]
+            mock_paste.return_value = test_text
+            
             set_clipboard(test_text)
             result = get_clipboard()
+            
+            mock_copy.assert_called_once_with(test_text)
+            mock_paste.assert_called_once()
             assert result == test_text
 
-    def test_macos_unicode_content(self):
+    @patch("mcp_clipboard_server.clipboard.pyperclip.copy")
+    @patch("mcp_clipboard_server.clipboard.pyperclip.paste")
+    def test_macos_unicode_content(self, mock_paste, mock_copy):
         """Test Unicode content on macOS."""
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["unicode"]
+            mock_paste.return_value = test_text
+            
             set_clipboard(test_text)
             result = get_clipboard()
+            
+            mock_copy.assert_called_once_with(test_text)
+            mock_paste.assert_called_once()
             assert result == test_text
 
-    def test_macos_rtf_fallback(self):
+    @patch("mcp_clipboard_server.clipboard.pyperclip.copy")
+    @patch("mcp_clipboard_server.clipboard.pyperclip.paste")
+    def test_macos_rtf_fallback(self, mock_paste, mock_copy):
         """Test RTF content fallback on macOS."""
         if platform.system() == "Darwin":
             test_text = TEST_CONTENT["rtf_fallback"]
+            mock_paste.return_value = test_text
+            
             set_clipboard(test_text)
             result = get_clipboard()
+            
+            mock_copy.assert_called_once_with(test_text)
+            mock_paste.assert_called_once()
             # Should get plain text even if rich text was set
             assert isinstance(result, str)
-            assert test_text in result or len(result) > 0
+            assert result == test_text
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-specific tests")
 class TestLinuxClipboard:
     """Test clipboard operations on Linux."""
 
+    @pytest.mark.serial
     def test_linux_ascii_content(self):
         """Test ASCII content on Linux."""
         if platform.system() == "Linux" and "DISPLAY" in os.environ:
@@ -224,6 +249,7 @@ class TestLinuxClipboard:
             result = get_clipboard()
             assert result == test_text
 
+    @pytest.mark.serial
     def test_linux_unicode_content(self):
         """Test Unicode content on Linux."""
         if platform.system() == "Linux" and "DISPLAY" in os.environ:
@@ -233,6 +259,7 @@ class TestLinuxClipboard:
             assert result == test_text
 
     @pytest.mark.skipif("DISPLAY" not in os.environ, reason="Requires display")
+    @pytest.mark.serial
     def test_linux_xclip_availability(self):
         """Test xclip/xsel availability on Linux."""
         if platform.system() == "Linux":
@@ -272,6 +299,7 @@ class TestClipboardFallbackHandling:
         error_msg = str(exc_info.value)
         assert len(error_msg) > 50  # Should be detailed
 
+    @pytest.mark.serial
     def test_empty_clipboard_handling(self):
         """Test handling of empty clipboard."""
         # This test ensures empty clipboard is handled gracefully
@@ -305,6 +333,7 @@ class TestClipboardFallbackHandling:
         mock_logger.error.assert_called()
         mock_logger.warning.assert_called()
 
+    @pytest.mark.serial
     def test_cross_process_clipboard_sharing(self):
         """Test clipboard sharing across processes."""
         # This test verifies that clipboard content persists across process boundaries

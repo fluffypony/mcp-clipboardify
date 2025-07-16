@@ -181,6 +181,7 @@ def test_tools_list_request(mcp_server):
     assert "set_clipboard" in tool_names
 
 
+@pytest.mark.serial
 def test_get_clipboard_tool(mcp_server):
     """Test the get_clipboard tool."""
     # Initialize first
@@ -223,6 +224,7 @@ def test_get_clipboard_tool(mcp_server):
     assert content[0]["text"] == test_text
 
 
+@pytest.mark.serial
 def test_set_clipboard_tool(mcp_server):
     """Test the set_clipboard tool."""
     # Initialize first
@@ -274,6 +276,12 @@ def test_unicode_content(mcp_server):
     }
     mcp_server.send_request(init_request)
 
+    # Clear clipboard first to ensure test isolation
+    try:
+        pyperclip.copy("")
+    except Exception:
+        pass
+
     # Test with various Unicode characters and emoji
     unicode_text = "Hello 世界! 🌍🚀 Ñoël ñ français αβγδε"
     set_request = {
@@ -285,6 +293,10 @@ def test_unicode_content(mcp_server):
 
     response = mcp_server.send_request(set_request)
     assert "result" in response
+
+    # Give a small delay to ensure clipboard is set
+    import time
+    time.sleep(0.1)
 
     # Verify Unicode content is preserved
     actual_clipboard = pyperclip.paste()
@@ -509,6 +521,7 @@ def test_platform_detection_windows():
         assert "result" in response
 
 
+@pytest.mark.serial
 def test_cross_platform_unicode_content():
     """Test Unicode content handling across platforms."""
     unicode_content = "Hello, 世界! 🌍 Café naïve résumé"
