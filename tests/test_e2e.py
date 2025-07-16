@@ -95,6 +95,16 @@ class MCPServerProcess:
             return json.loads(response_line.strip())
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON response: {response_line.strip()}") from e
+    
+    def __enter__(self):
+        """Context manager entry."""
+        self.start()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.stop()
+        return False
 
 
 @pytest.fixture
