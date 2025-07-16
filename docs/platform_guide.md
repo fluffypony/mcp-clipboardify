@@ -20,12 +20,12 @@ This guide provides detailed platform-specific instructions for installing and c
 
 ### Installation
 
-#### Option 1: Using pip (Recommended)
+### # Option 1: Using pip (Recommended)
 ```cmd
 pip install mcp-clipboardify
 ```
 
-#### Option 2: Using Poetry
+### # Option 2: Using Poetry
 ```cmd
 git clone https://github.com/fluffypony/mcp-clipboardify
 cd mcp-clipboardify
@@ -35,7 +35,7 @@ poetry run mcp-clipboardify
 
 ### Configuration
 
-#### Basic Usage
+### # Basic Usage
 ```cmd
 # Start the server
 mcp-clipboardify
@@ -48,7 +48,7 @@ set MCP_LOG_LEVEL=DEBUG
 mcp-clipboardify
 ```
 
-#### Enterprise Environments
+### # Enterprise Environments
 
 If running in a corporate environment with restricted permissions:
 
@@ -56,7 +56,7 @@ If running in a corporate environment with restricted permissions:
 2. **Antivirus Software**: Add exceptions for Python processes if clipboard access is blocked
 3. **User Account Control**: Run with appropriate privileges
 
-#### PowerShell Integration
+### # PowerShell Integration
 ```powershell
 # Install using PowerShell
 pip install mcp-clipboardify
@@ -68,7 +68,7 @@ mcp-clipboardify
 
 ### Troubleshooting
 
-#### Common Issues
+### # Common Issues
 
 **Clipboard Access Denied**
 ```cmd
@@ -101,7 +101,7 @@ set PYTHONIOENCODING=utf-8
 
 ### Installation
 
-#### Option 1: Using pip with Homebrew Python
+### # Option 1: Using pip with Homebrew Python
 ```bash
 # Install Homebrew if not already installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -113,13 +113,13 @@ brew install python
 pip3 install mcp-clipboardify
 ```
 
-#### Option 2: Using system Python
+### # Option 2: Using system Python
 ```bash
 # Install using system Python (requires pip)
 python3 -m pip install --user mcp-clipboardify
 ```
 
-#### Option 3: Using Poetry
+### # Option 3: Using Poetry
 ```bash
 git clone https://github.com/fluffypony/mcp-clipboardify
 cd mcp-clipboardify
@@ -129,7 +129,7 @@ poetry run mcp-clipboardify
 
 ### Configuration
 
-#### Security and Privacy Settings
+### # Security and Privacy Settings
 
 macOS may require additional permissions:
 
@@ -137,7 +137,7 @@ macOS may require additional permissions:
 2. **Input Monitoring**: Add Terminal.app or your application
 3. **Accessibility**: May be required for some clipboard operations
 
-#### Terminal Configuration
+### # Terminal Configuration
 ```bash
 # Add to ~/.zshrc or ~/.bash_profile
 export MCP_LOG_LEVEL=DEBUG
@@ -150,7 +150,7 @@ export LC_ALL=en_US.UTF-8
 
 ### Troubleshooting
 
-#### Permission Denied Errors
+### # Permission Denied Errors
 ```bash
 # Reset permissions (macOS 12+)
 tccutil reset All
@@ -160,14 +160,14 @@ tccutil reset All
 # Add your terminal application to required categories
 ```
 
-#### Sandboxed Applications
+### # Sandboxed Applications
 ```bash
 # Some sandboxed apps may have limited clipboard access
 # This is expected behavior for security
 # Use non-sandboxed terminals like iTerm2 or Terminal.app
 ```
 
-#### M1/M2 Apple Silicon
+### # M1/M2 Apple Silicon
 ```bash
 # Ensure you're using the correct Python architecture
 python3 -c "import platform; print(platform.machine())"
@@ -185,7 +185,7 @@ python3 -c "import platform; print(platform.machine())"
 
 ### Distribution-Specific Installation
 
-#### Ubuntu/Debian
+### # Ubuntu/Debian
 ```bash
 # Update package list
 sudo apt-get update
@@ -200,7 +200,7 @@ pip3 install --user mcp-clipboardify
 sudo pip3 install mcp-clipboardify
 ```
 
-#### RHEL/CentOS/Fedora
+### # RHEL/CentOS/Fedora
 ```bash
 # RHEL/CentOS 7/8
 sudo yum install python3 python3-pip xclip xsel
@@ -212,7 +212,7 @@ sudo dnf install python3 python3-pip xclip xsel
 pip3 install --user mcp-clipboardify
 ```
 
-#### Arch Linux
+### # Arch Linux
 ```bash
 # Install dependencies
 sudo pacman -S python python-pip xclip xsel
@@ -221,7 +221,7 @@ sudo pacman -S python python-pip xclip xsel
 pip install --user mcp-clipboardify
 ```
 
-#### Alpine Linux
+### # Alpine Linux
 ```bash
 # Install dependencies
 sudo apk add python3 py3-pip xclip xsel
@@ -232,7 +232,7 @@ pip3 install --user mcp-clipboardify
 
 ### Configuration
 
-#### Environment Setup
+### # Environment Setup
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.local/bin:$PATH"
@@ -242,7 +242,7 @@ export MCP_LOG_LEVEL=DEBUG
 export DISPLAY=:0
 ```
 
-#### Systemd Service (Optional)
+### # Systemd Service (Optional)
 ```bash
 # Create service file
 sudo tee /etc/systemd/system/mcp-clipboard.service << EOF
@@ -268,7 +268,7 @@ sudo systemctl start mcp-clipboard.service
 
 ### Troubleshooting
 
-#### Missing Clipboard Utilities
+### # Missing Clipboard Utilities
 ```bash
 # Error: "xclip not found"
 sudo apt-get install xclip xsel  # Ubuntu/Debian
@@ -279,7 +279,7 @@ sudo pacman -S xclip xsel        # Arch
 which xclip xsel
 ```
 
-#### No Display Server
+### # No Display Server
 ```bash
 # For headless systems (servers)
 # Read operations will return empty string (graceful)
@@ -290,7 +290,7 @@ echo "test" | xclip -selection clipboard
 xclip -selection clipboard -o
 ```
 
-#### Wayland Compatibility
+### # Wayland Compatibility
 ```bash
 # For Wayland sessions, install wl-clipboard
 sudo apt-get install wl-clipboard  # Ubuntu/Debian
@@ -307,7 +307,7 @@ sudo apt-get install wl-clipboard  # Ubuntu/Debian
 
 ### Installation
 
-#### Step 1: Enable Clipboard Integration
+### # Step 1: Enable Clipboard Integration
 ```bash
 # Install Windows integration tools
 sudo apt-get update
@@ -317,7 +317,7 @@ sudo apt-get install wslu
 which clip.exe
 ```
 
-#### Step 2: Install MCP Clipboard Server
+### # Step 2: Install MCP Clipboard Server
 ```bash
 # Install dependencies
 sudo apt-get install python3 python3-pip
@@ -326,7 +326,7 @@ sudo apt-get install python3 python3-pip
 pip3 install --user mcp-clipboardify
 ```
 
-#### Step 3: Configure WSL
+### # Step 3: Configure WSL
 Add to `~/.wslconfig` (Windows user directory):
 ```ini
 [wsl2]
@@ -336,7 +336,7 @@ systemdEnabled=true
 
 ### Configuration
 
-#### Environment Setup
+### # Environment Setup
 ```bash
 # Add to ~/.bashrc
 export PATH="$HOME/.local/bin:$PATH"
@@ -346,7 +346,7 @@ alias pbcopy='clip.exe'
 alias pbpaste='powershell.exe -command "Get-Clipboard"'
 ```
 
-#### Windows Terminal Integration
+### # Windows Terminal Integration
 Ensure Windows Terminal has clipboard sharing enabled:
 1. Open Windows Terminal
 2. Settings → Interaction
@@ -354,7 +354,7 @@ Ensure Windows Terminal has clipboard sharing enabled:
 
 ### Troubleshooting
 
-#### Clipboard Not Working
+### # Clipboard Not Working
 ```bash
 # Test Windows clipboard integration
 echo "test" | clip.exe
@@ -364,7 +364,7 @@ powershell.exe -command "Get-Clipboard"
 python3 -c "import pyperclip; print(pyperclip.paste())"
 ```
 
-#### Permission Issues
+### # Permission Issues
 ```bash
 # Ensure proper WSL2 permissions
 # Restart WSL if clipboard stops working
@@ -378,12 +378,12 @@ wsl --shutdown
 
 Clipboard access in containers is limited by design. The MCP Clipboard Server handles this gracefully:
 
-#### Behavior in Containers
+### # Behavior in Containers
 - **Read operations**: Return empty string (graceful fallback)
 - **Write operations**: Fail with descriptive error messages
 - **Logging**: Indicates container environment detected
 
-#### Testing in Containers
+### # Testing in Containers
 ```dockerfile
 # Example Dockerfile for testing
 FROM python:3.11-slim
@@ -394,7 +394,7 @@ RUN pip install mcp-clipboardify
 ENTRYPOINT ["python", "-m", "mcp_clipboard_server"]
 ```
 
-#### Host Clipboard Access (Linux)
+### # Host Clipboard Access (Linux)
 ```bash
 # Mount X11 socket for clipboard access (not recommended for production)
 docker run -v /tmp/.X11-unix:/tmp/.X11-unix \

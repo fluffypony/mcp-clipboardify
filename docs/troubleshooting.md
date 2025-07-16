@@ -46,7 +46,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 
 ### 🪟 Windows Issues
 
-#### Error: "Access is denied" or "Clipboard unavailable"
+### # Error: "Access is denied" or "Clipboard unavailable"
 
 **Symptoms:**
 - Clipboard operations fail with permission errors
@@ -67,7 +67,7 @@ python -c "import pyperclip; print(pyperclip.paste())"
 3. **UAC Settings**: Try running with elevated privileges (not recommended)
 4. **Windows Updates**: Ensure latest Windows updates installed
 
-#### Error: "Unicode decode error" or strange characters
+### # Error: "Unicode decode error" or strange characters
 
 **Symptoms:**
 - International text displays incorrectly
@@ -85,7 +85,7 @@ python -X utf8 -m mcp_clipboard_server
 
 ### 🍎 macOS Issues
 
-#### Error: "Operation not permitted" or "Accessibility access required"
+### # Error: "Operation not permitted" or "Accessibility access required"
 
 **Symptoms:**
 - Clipboard access denied
@@ -105,7 +105,7 @@ tccutil reset All
 tccutil list
 ```
 
-#### Error: "No module named '_tkinter'" with some clipboard operations
+### # Error: "No module named '_tkinter'" with some clipboard operations
 
 **Solutions:**
 ```bash
@@ -118,7 +118,7 @@ conda install tk
 
 ### 🐧 Linux Issues
 
-#### Error: "xclip: command not found" or "xsel: command not found"
+### # Error: "xclip: command not found" or "xsel: command not found"
 
 **Symptoms:**
 - Clipboard operations fail on Linux
@@ -145,7 +145,7 @@ which xclip xsel
 xclip -version
 ```
 
-#### Error: "Cannot open display" or "No protocol specified"
+### # Error: "Cannot open display" or "No protocol specified"
 
 **Symptoms:**
 - X11 display errors
@@ -166,7 +166,7 @@ ssh -X username@hostname
 # Read operations will return empty string gracefully
 ```
 
-#### Error: Wayland clipboard issues
+### # Error: Wayland clipboard issues
 
 **Solutions:**
 ```bash
@@ -182,7 +182,7 @@ wl-paste
 
 ### 🔧 WSL Issues
 
-#### Error: "clip.exe not found" or clipboard not working
+### # Error: "clip.exe not found" or clipboard not working
 
 **Symptoms:**
 - WSL clipboard integration fails
@@ -207,7 +207,7 @@ echo 'export PATH="$PATH:/mnt/c/Windows/System32"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### Error: WSL clipboard stops working after sleep/hibernate
+### # Error: WSL clipboard stops working after sleep/hibernate
 
 **Solutions:**
 ```bash
@@ -223,7 +223,7 @@ wsl --terminate Ubuntu-20.04
 
 ### Common JSON-RPC Errors
 
-#### Parse Error (-32700)
+### # Parse Error (-32700)
 ```json
 {
   "jsonrpc": "2.0",
@@ -238,7 +238,7 @@ wsl --terminate Ubuntu-20.04
 **Cause:** Invalid JSON sent to server
 **Solution:** Check JSON formatting, ensure proper escaping
 
-#### Invalid Request (-32600)
+### # Invalid Request (-32600)
 ```json
 {
   "jsonrpc": "2.0",
@@ -254,7 +254,7 @@ wsl --terminate Ubuntu-20.04
 **Cause:** Malformed JSON-RPC request
 **Solution:** Ensure jsonrpc, method, and id fields are present
 
-#### Method Not Found (-32601)
+### # Method Not Found (-32601)
 ```json
 {
   "jsonrpc": "2.0",
@@ -269,7 +269,7 @@ wsl --terminate Ubuntu-20.04
 **Cause:** Called undefined method
 **Solution:** Use only supported methods: initialize, tools/list, tools/call
 
-#### Invalid Params (-32602)
+### # Invalid Params (-32602)
 ```json
 {
   "jsonrpc": "2.0",
@@ -286,7 +286,7 @@ wsl --terminate Ubuntu-20.04
 
 ### Clipboard-Specific Errors
 
-#### "Clipboard operation failed: Failed to read clipboard"
+### # "Clipboard operation failed: Failed to read clipboard"
 **Cause:** Platform-specific clipboard access issue
 **Diagnosis:**
 ```bash
@@ -298,11 +298,11 @@ mcp-clipboardify
 python3 -c "from mcp_clipboard_server.clipboard import _get_platform_info; print(_get_platform_info())"
 ```
 
-#### "Validation error: Text exceeds maximum size"
+### # "Validation error: Text exceeds maximum size"
 **Cause:** Text larger than 1MB limit
 **Solution:** Split large text into smaller chunks
 
-#### "Failed to write to clipboard: Permission denied"
+### # "Failed to write to clipboard: Permission denied"
 **Cause:** Insufficient permissions or platform restrictions
 **Solution:** Check platform-specific permission requirements
 
@@ -467,39 +467,39 @@ if __name__ == "__main__":
 
 ### Platform Limitations
 
-#### Linux
+### # Linux
 - **Headless Systems**: No clipboard access (graceful degradation)
 - **Wayland**: Requires wl-clipboard utilities
 - **Performance**: Slower than native platforms due to external tools
 
-#### macOS
+### # macOS
 - **Sandboxed Apps**: Limited clipboard access in sandboxed environments
 - **Security**: Requires explicit permission grants
 - **RTF Content**: Complex formatted content may be simplified
 
-#### Windows
+### # Windows
 - **Enterprise Policies**: May restrict clipboard access
 - **Antivirus**: May interfere with clipboard operations
 - **Unicode**: Encoding issues in some terminal environments
 
-#### WSL
+### # WSL
 - **Sleep/Resume**: Clipboard may stop working after system sleep
 - **Performance**: Cross-system calls add latency
 - **Integration**: Requires Windows integration tools
 
 ### Technical Limitations
 
-#### Text Size
+### # Text Size
 - **Maximum**: 1MB per operation
 - **Performance**: Degrades with large content
 - **Memory**: Held in memory during operations
 
-#### Concurrency
+### # Concurrency
 - **Single-threaded**: One operation at a time
 - **No Queuing**: Operations may fail if clipboard is busy
 - **State**: No persistence between operations
 
-#### Protocol
+### # Protocol
 - **STDIO Only**: No network or file-based transport
 - **Synchronous**: No async operations
 - **Session**: No multi-session support
@@ -515,17 +515,17 @@ if __name__ == "__main__":
 
 ### Where to Get Help
 
-#### GitHub Issues
+### # GitHub Issues
 - **Bug Reports**: [Create an issue](https://github.com/fluffypony/mcp-clipboardify/issues/new?template=bug_report.md)
 - **Feature Requests**: [Request a feature](https://github.com/fluffypony/mcp-clipboardify/issues/new?template=feature_request.md)
 - **Search**: Check existing issues first
 
-#### Discussions
+### # Discussions
 - **Questions**: [GitHub Discussions](https://github.com/fluffypony/mcp-clipboardify/discussions)
 - **Community**: Get help from other users
 - **Best Practices**: Share and learn implementation tips
 
-#### Documentation
+### # Documentation
 - **Platform Guide**: [Platform-specific instructions](platform_guide.md)
 - **API Reference**: [MCP Protocol Documentation](https://spec.modelcontextprotocol.io/)
 - **Examples**: Check the examples directory
@@ -568,20 +568,20 @@ cat debug.log
 
 ### Common Support Questions
 
-#### "How do I integrate with my application?"
+### # "How do I integrate with my application?"
 See the [integration examples](../examples/) and MCP protocol documentation.
 
-#### "Can I use this in production?"
+### # "Can I use this in production?"
 Yes, the server is production-ready with comprehensive error handling and logging.
 
-#### "Does this work with my CI/CD system?"
+### # "Does this work with my CI/CD system?"
 Yes, with proper setup. See the [platform guide](platform_guide.md) for CI/CD configurations.
 
-#### "How do I handle large clipboard content?"
+### # "How do I handle large clipboard content?"
 Split content into chunks under 1MB each, or use alternative transfer methods for large data.
 
-#### "Can I run multiple instances?"
+### # "Can I run multiple instances?"
 Each instance manages its own clipboard state. Multiple instances may interfere with each other.
 
-#### "Is clipboard content secure?"
+### # "Is clipboard content secure?"
 Content is not logged or persisted. Use appropriate security measures for sensitive data.

@@ -90,7 +90,7 @@ The MCP Clipboard Server follows a layered architecture with clear separation of
 
 ### Public API Modules
 
-#### cli.py
+### # cli.py
 **Purpose**: Command-line interface and application entry point
 
 <!-- SOURCE: src/mcp_clipboard_server/cli.py -->
@@ -99,7 +99,7 @@ The MCP Clipboard Server follows a layered architecture with clear separation of
 class CLIHandler:
     """
     Handles command-line interface and signal management.
-    
+
     Features:
     - Signal handling (SIGTERM, SIGINT)
     - Graceful shutdown coordination
@@ -114,7 +114,7 @@ class CLIHandler:
 - Set up signal handlers for graceful shutdown
 - Coordinate server startup and teardown
 
-#### server.py
+### # server.py
 **Purpose**: Main server loop and STDIO communication
 
 <!-- SOURCE: src/mcp_clipboard_server/server.py:22-50 -->
@@ -150,7 +150,7 @@ class MCPServer:
 - Handle server lifecycle events
 - Provide compatibility interface for testing
 
-#### protocol.py
+### # protocol.py
 **Purpose**: JSON-RPC 2.0 message handling
 
 <!-- SOURCE: src/mcp_clipboard_server/protocol.py -->
@@ -159,14 +159,14 @@ class MCPServer:
 def parse_json_rpc_message(line: str) -> Union[JsonRpcRequest, List[JsonRpcRequest]]:
     """
     Parse JSON-RPC message from input line.
-    
+
     Handles both single requests and batch requests according to JSON-RPC 2.0.
     """
 
 def create_batch_response(responses: List[str]) -> str:
     """
     Create a JSON-RPC batch response.
-    
+
     Args:
         responses: List of individual JSON response strings.
     """
@@ -178,7 +178,7 @@ def create_batch_response(responses: List[str]) -> str:
 - Generate properly formatted responses
 - Manage JSON serialization/deserialization
 
-#### tools.py
+### # tools.py
 **Purpose**: Tool implementation and execution
 
 <!-- SOURCE: src/mcp_clipboard_server/tools.py:20-28 -->
@@ -201,7 +201,7 @@ def list_tools() -> Dict[str, Any]:
 - Execute clipboard operations
 - Format tool results according to MCP specification
 
-#### clipboard.py
+### # clipboard.py
 **Purpose**: Cross-platform clipboard abstraction
 
 <!-- SOURCE: src/mcp_clipboard_server/clipboard.py -->
@@ -225,7 +225,7 @@ def set_clipboard(text: str) -> None:
 
 ### Private Implementation Modules
 
-#### _mcp_handler.py
+### # _mcp_handler.py
 **Purpose**: Core MCP protocol implementation
 
 <!-- SOURCE: src/mcp_clipboard_server/_mcp_handler.py -->
@@ -234,7 +234,7 @@ def set_clipboard(text: str) -> None:
 class MCPHandler:
     """
     Core MCP protocol implementation.
-    
+
     Handles method dispatch, schema validation, and protocol compliance.
     """
 ```
@@ -245,7 +245,7 @@ class MCPHandler:
 - Manage server initialization state
 - Coordinate with tool layer
 
-#### _protocol_types.py
+### # _protocol_types.py
 **Purpose**: Type-safe protocol data structures
 
 <!-- SOURCE: src/mcp_clipboard_server/_protocol_types.py:14-40 -->
@@ -276,7 +276,7 @@ class ServerInfo(TypedDict):
 - Provide IDE support and documentation
 - Maintain protocol version compatibility
 
-#### _tool_schemas.py
+### # _tool_schemas.py
 **Purpose**: JSON Schema definitions for tools
 
 <!-- SOURCE: src/mcp_clipboard_server/_tool_schemas.py:8-41 -->
@@ -325,7 +325,7 @@ TOOL_DEFINITIONS: Dict[str, ToolDefinition] = {
 - Support comprehensive parameter validation
 - Enable automatic documentation generation
 
-#### _errors.py
+### # _errors.py
 **Purpose**: Centralized error handling
 
 <!-- SOURCE: src/mcp_clipboard_server/_errors.py:17-74 -->
@@ -362,7 +362,7 @@ EXCEPTION_TO_ERROR_CODE: Dict[
 - Generate consistent error responses
 - Provide debugging information
 
-#### _validators.py
+### # _validators.py
 **Purpose**: Input validation utilities
 
 <!-- SOURCE: src/mcp_clipboard_server/_validators.py -->
@@ -374,11 +374,11 @@ class ValidationException(Exception):
 def validate_text_size(text: str, max_size: int = 1048576) -> None:
     """
     Validate text size against maximum limit.
-    
+
     Args:
         text: Text to validate
         max_size: Maximum allowed size in characters
-        
+
     Raises:
         ValidationException: If text exceeds maximum size
     """
@@ -390,7 +390,7 @@ def validate_text_size(text: str, max_size: int = 1048576) -> None:
 - Provide detailed validation error messages
 - Support extensible validation rules
 
-#### _logging_config.py
+### # _logging_config.py
 **Purpose**: Structured logging configuration
 
 <!-- SOURCE: src/mcp_clipboard_server/_logging_config.py -->
@@ -462,7 +462,7 @@ flowchart TD
     O -->|Validation| Q[Validation Error -32002]
     O -->|Other| R[Server Error -32000]
     N -->|Yes| S[Success Response]
-    
+
     C --> T[Send Error Response]
     E --> T
     G --> T
@@ -485,7 +485,7 @@ The server uses a **single-threaded synchronous model** for several important re
 def run(self, shutdown_event: threading.Event):
     """
     Main server loop processing requests synchronously.
-    
+
     Design rationale:
     1. Clipboard operations are inherently serialized by the OS
     2. STDIO communication is naturally blocking
@@ -499,13 +499,13 @@ def run(self, shutdown_event: threading.Event):
             line = sys.stdin.readline()
             if not line:  # EOF
                 break
-                
+
             # Process request synchronously
             response = self.handle_request(line.strip())
-            
+
             # Send response immediately
             print(response, flush=True)
-            
+
         except KeyboardInterrupt:
             break
         except Exception as e:
@@ -527,15 +527,15 @@ The server implements graceful shutdown through signal handling:
 # FROM: src/mcp_clipboard_server/cli.py
 def setup_signal_handlers(shutdown_event: threading.Event):
     """Set up signal handlers for graceful shutdown."""
-    
+
     def signal_handler(signum, frame):
         logger.info("Received signal %d, shutting down gracefully", signum)
         shutdown_event.set()
-    
+
     # Handle SIGTERM and SIGINT (Unix/Linux/macOS)
     if hasattr(signal, 'SIGTERM'):
         signal.signal(signal.SIGTERM, signal_handler)
-    
+
     signal.signal(signal.SIGINT, signal_handler)
 ```
 
@@ -560,7 +560,7 @@ def validate_text_size(text: str, max_size: int = 1048576) -> None:
     """
     Multi-layer validation:
     1. Type checking (string validation)
-    2. Size limits (1MB maximum)  
+    2. Size limits (1MB maximum)
     3. Unicode safety (UTF-8 encoding)
     4. Memory bounds (prevent DoS)
     """
@@ -591,24 +591,24 @@ The server implements intelligent platform detection with priority ordering:
 def detect_platform():
     """
     Platform detection with priority ordering:
-    
+
     1. WSL (Windows Subsystem for Linux) - Highest priority
        - Detected by /proc/version containing "Microsoft" or "WSL"
        - Uses Windows clipboard integration
-       
+
     2. Windows - Native Windows
        - Uses win32clipboard or tkinter fallback
-       
-    3. macOS - Apple platforms  
+
+    3. macOS - Apple platforms
        - Uses pasteboard APIs or pbpaste/pbcopy
-       
+
     4. Linux Wayland - Modern Linux
        - Detected by WAYLAND_DISPLAY environment variable
        - Uses wl-clipboard tools (wl-copy/wl-paste)
-       
+
     5. Linux X11 - Traditional Linux
        - Uses xclip or xsel utilities
-       
+
     6. Headless - No display environment
        - Graceful degradation with informative errors
     """
@@ -642,7 +642,7 @@ The server provides platform-specific error messages and resolution guidance:
 def get_platform_error_guidance(platform: str, error: Exception) -> str:
     """
     Generate platform-specific error guidance.
-    
+
     Provides actionable troubleshooting steps based on:
     - Platform type and version
     - Error type and message
@@ -661,7 +661,7 @@ The testing strategy covers multiple layers and integration scenarios:
 tests/
 ├── test_unit/              # Unit tests for individual modules
 │   ├── test_protocol.py    # JSON-RPC protocol testing
-│   ├── test_tools.py       # Tool implementation testing  
+│   ├── test_tools.py       # Tool implementation testing
 │   ├── test_clipboard.py   # Clipboard abstraction testing
 │   └── test_errors.py      # Error handling testing
 ├── test_integration/       # Integration tests
@@ -699,7 +699,7 @@ class MCPIntegrationTest(unittest.TestCase):
 def test_windows_clipboard():
     """Test Windows-specific clipboard functionality."""
 
-@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-specific test")  
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-specific test")
 def test_macos_clipboard():
     """Test macOS-specific clipboard functionality."""
 
@@ -724,7 +724,7 @@ class TestExecuteTool:
         mock_execute.return_value = {
             "content": [{"type": "text", "text": "test content"}]
         }
-        
+
         result = execute_tool("get_clipboard", {})
         assert result["content"][0]["text"] == "test content"
         mock_execute.assert_called_once()
@@ -760,7 +760,7 @@ class TestExecuteTool:
 def setup_logging():
     """
     Configure comprehensive logging:
-    
+
     - Request/response correlation IDs
     - Performance timing metrics
     - Error tracking and categorization
@@ -826,9 +826,9 @@ While the current implementation is focused on clipboard operations, the archite
 def register_new_tool(name: str, schema: ToolInputSchema, handler: Callable):
     """
     Future extension point for additional tools:
-    
+
     - File system operations
-    - System information queries  
+    - System information queries
     - Process management
     - Network operations
     """

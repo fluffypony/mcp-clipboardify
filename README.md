@@ -73,7 +73,7 @@ Sets the system clipboard to the provided text content.
 
 The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patterns:
 
-#### Initialize the connection:
+### # Initialize the connection:
 ```json
 {
   "jsonrpc": "2.0",
@@ -90,7 +90,7 @@ The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patte
 }
 ```
 
-#### List available tools:
+### # List available tools:
 ```json
 {
   "jsonrpc": "2.0",
@@ -100,7 +100,7 @@ The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patte
 }
 ```
 
-#### Get clipboard content:
+### # Get clipboard content:
 ```json
 {
   "jsonrpc": "2.0",
@@ -113,7 +113,7 @@ The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patte
 }
 ```
 
-#### Set clipboard content:
+### # Set clipboard content:
 ```json
 {
   "jsonrpc": "2.0",
@@ -128,7 +128,7 @@ The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patte
 }
 ```
 
-#### Batch Requests (JSON-RPC 2.0)
+### # Batch Requests (JSON-RPC 2.0)
 The server supports batch requests for processing multiple operations in a single call:
 ```json
 [
@@ -228,7 +228,7 @@ print(response)
 
 ### Platform-Specific Setup
 
-#### Linux
+### # Linux
 You may need to install additional packages for clipboard support:
 
 ```bash
@@ -241,7 +241,7 @@ sudo apt-get install xsel
 sudo dnf install xclip
 ```
 
-#### Windows & macOS
+### # Windows & macOS
 No additional setup required - clipboard access works out of the box.
 
 ### Install from PyPI
@@ -318,19 +318,19 @@ poetry run black src/ tests/
 
 The MCP Clipboard Server provides comprehensive cross-platform support with intelligent fallback handling:
 
-#### ✅ Windows
+### # ✅ Windows
 - **Requirements**: No additional dependencies
 - **Supported**: Windows 10/11, Windows Server 2019+
 - **Features**: Full Unicode support, CRLF line ending handling
 - **Notes**: May require clipboard access permissions in some enterprise environments
 
-#### ✅ macOS
+### # ✅ macOS
 - **Requirements**: macOS 10.15+ recommended
 - **Supported**: Intel and Apple Silicon Macs
 - **Features**: Full Unicode support, RTF content fallback to plain text
 - **Notes**: Security permissions may be required (System Preferences > Privacy & Security)
 
-#### ✅ Linux
+### # ✅ Linux
 - **Requirements**: X11 display server and clipboard utilities
 - **Installation**:
   ```bash
@@ -347,7 +347,7 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 - **Features**: Full Unicode support, headless environment detection
 - **Notes**: Requires DISPLAY environment variable for GUI clipboard access
 
-#### 🔧 WSL (Windows Subsystem for Linux)
+### # 🔧 WSL (Windows Subsystem for Linux)
 - **Requirements**: WSL2 with Windows 10 build 19041+
 - **Installation**:
   ```bash
@@ -356,7 +356,7 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 - **Features**: Clipboard sharing with Windows host
 - **Notes**: Use Windows Terminal or enable clipboard sharing in WSL configuration
 
-#### 🚫 Headless/Server Environments
+### # 🚫 Headless/Server Environments
 - **Behavior**: Graceful degradation - read operations return empty string
 - **Use Case**: Automated testing, CI/CD environments
 - **Notes**: Write operations will fail with descriptive error messages
@@ -365,7 +365,7 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 
 The server automatically detects your platform and provides specific guidance when clipboard operations fail:
 
-#### Linux Troubleshooting
+### # Linux Troubleshooting
 ```bash
 # Missing utilities error
 sudo apt-get install xclip xsel
@@ -378,7 +378,7 @@ export DISPLAY=:0  # or run in desktop environment
 # Write operations fail with clear error message
 ```
 
-#### WSL Troubleshooting
+### # WSL Troubleshooting
 ```bash
 # Install Windows integration
 sudo apt-get install wslu
@@ -388,7 +388,7 @@ sudo apt-get install wslu
 guiApplications=true
 ```
 
-#### macOS Troubleshooting
+### # macOS Troubleshooting
 ```bash
 # Security permissions
 # Go to System Preferences > Privacy & Security > Input Monitoring
@@ -398,7 +398,7 @@ guiApplications=true
 # May have limited clipboard access
 ```
 
-#### Windows Troubleshooting
+### # Windows Troubleshooting
 ```cmd
 REM Antivirus blocking
 REM Add exception for clipboard access
@@ -409,18 +409,18 @@ REM Check with IT administrator for clipboard permissions
 
 ### Common Issues
 
-#### Platform Detection Issues
+### # Platform Detection Issues
 **Symptoms**: Unexpected platform-specific errors
 **Solution**: The server automatically detects your environment. Check logs with `MCP_LOG_LEVEL=DEBUG` for detailed platform information.
 
-#### Unicode Content Problems
+### # Unicode Content Problems
 **Symptoms**: International text or emoji not displaying correctly
 **Solution**: Ensure your terminal/application supports UTF-8 encoding. The server handles Unicode correctly on all platforms.
 
-#### Large Content Handling
+### # Large Content Handling
 **Solution**: The server enforces a 1MB limit. Split large content into smaller chunks.
 
-#### Server Not Responding
+### # Server Not Responding
 **Solution**: Check that the client is sending proper JSON-RPC 2.0 formatted messages.
 
 ### Debugging

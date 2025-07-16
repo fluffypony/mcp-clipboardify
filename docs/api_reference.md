@@ -483,7 +483,7 @@ SET_CLIPBOARD_SCHEMA: ToolInputSchema = {
 The server maps exceptions to appropriate JSON-RPC error codes:
 
 - `ValueError` → `-32602` Invalid params
-- `ClipboardError` → `-32001` Clipboard error  
+- `ClipboardError` → `-32001` Clipboard error
 - `ValidationException` → `-32602` Invalid params
 - `RuntimeError` → `-32000` Server error
 
@@ -513,7 +513,7 @@ test_data = {
 The server automatically detects platform capabilities and provides appropriate error guidance:
 
 - **Windows**: Uses native Win32 clipboard APIs
-- **macOS**: Uses Pasteboard APIs  
+- **macOS**: Uses Pasteboard APIs
 - **Linux X11**: Requires `xclip` or `xsel`
 - **Linux Wayland**: Uses `wl-clipboard` tools
 - **WSL**: Integrates with Windows clipboard
@@ -533,7 +533,7 @@ All messages are line-delimited JSON objects:
 ### STDIO Protocol
 
 - **Input**: Read from `stdin`
-- **Output**: Write to `stdout` 
+- **Output**: Write to `stdout`
 - **Errors**: Log to `stderr`
 - **Buffering**: Explicit flush after each response
 - **Encoding**: UTF-8
@@ -550,7 +550,7 @@ All messages are line-delimited JSON objects:
 The server handles shutdown signals gracefully:
 
 - **SIGTERM**: Clean shutdown (Unix/Linux/macOS)
-- **SIGINT**: Interrupt handling (Ctrl+C)  
+- **SIGINT**: Interrupt handling (Ctrl+C)
 - **EOF**: Stdin closure detection
 - **Windows**: Polling-based shutdown detection
 
@@ -611,9 +611,9 @@ async def async_mcp_client():
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    
+
     reader, writer = process.stdout, process.stdin
-    
+
     # Send request
     request = {
         "jsonrpc": "2.0",
@@ -624,15 +624,15 @@ async def async_mcp_client():
             "clientInfo": {"name": "test", "version": "1.0"}
         }
     }
-    
+
     request_line = json.dumps(request) + "\n"
     writer.write(request_line.encode())
     await writer.drain()
-    
+
     # Read response
     response_line = await reader.readline()
     response = json.loads(response_line.decode())
-    
+
     return response
 ```
 
@@ -648,27 +648,27 @@ For testing clipboard functionality:
 async def test_clipboard_roundtrip():
     """Test setting and getting clipboard content."""
     reader, writer = await start_server()
-    
+
     # Initialize
     await send_request(writer, "initialize", {
         "protocolVersion": "2024-11-05"
     })
     await read_response(reader)
-    
+
     # Set clipboard
     await send_request(writer, "tools/call", {
         "name": "set_clipboard",
         "arguments": {"text": "test content"}
     })
     set_response = await read_response(reader)
-    
+
     # Get clipboard
     await send_request(writer, "tools/call", {
         "name": "get_clipboard",
         "arguments": {}
     })
     get_response = await read_response(reader)
-    
+
     assert get_response["result"]["content"][0]["text"] == "test content"
 ```
 
@@ -677,7 +677,7 @@ async def test_clipboard_roundtrip():
 The server includes platform-specific tests for:
 
 - Windows native clipboard APIs
-- macOS Pasteboard integration  
+- macOS Pasteboard integration
 - Linux X11 clipboard utilities
 - Wayland wl-clipboard support
 - WSL clipboard bridging
@@ -733,7 +733,7 @@ Enable detailed protocol logging:
 
 ```bash
 export MCP_LOG_LEVEL=DEBUG
-export MCP_LOG_JSON=true  
+export MCP_LOG_JSON=true
 mcp-clipboardify
 ```
 

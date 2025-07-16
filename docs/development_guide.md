@@ -64,7 +64,7 @@ mypy = "^1.5.0"                   # Type checking
 
 ### Platform-Specific Setup
 
-#### Linux Development
+### # Linux Development
 ```bash
 # Install clipboard utilities for testing
 sudo apt-get install xclip xsel wl-clipboard  # Ubuntu/Debian
@@ -72,14 +72,14 @@ sudo dnf install xclip xsel wl-clipboard      # Fedora
 sudo pacman -S xclip xsel wl-clipboard        # Arch
 ```
 
-#### macOS Development
+### # macOS Development
 ```bash
 # No additional setup required
 # Verify clipboard tools are available
 which pbcopy && which pbpaste
 ```
 
-#### Windows Development
+### # Windows Development
 ```cmd
 REM No additional setup required
 REM Verify Python and Poetry installation
@@ -276,7 +276,7 @@ def test_windows_clipboard():
     """Test Windows-specific clipboard functionality."""
     # Windows-specific test implementation
 
-@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-specific test")  
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-specific test")
 def test_macos_clipboard():
     """Test macOS-specific clipboard functionality."""
     # macOS-specific test implementation
@@ -296,7 +296,7 @@ E2E tests validate complete system behavior:
 ```python
 class MCPServerProcess:
     """Context manager for MCP server subprocess testing."""
-    
+
     def __enter__(self):
         """Start server process."""
         self.process = subprocess.Popen(
@@ -307,7 +307,7 @@ class MCPServerProcess:
             text=True
         )
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Clean up server process."""
         if self.process:
@@ -353,7 +353,7 @@ def execute_tool(tool_name: str, params: Dict[str, Any]) -> ToolCallResult:
     if tool_name == "new_tool":
         parameter = params["parameter"]
         return execute_new_tool(parameter)
-    
+
     # ... existing tool handling
 
 def validate_tool_params(tool_name: str, params: Dict[str, Any]) -> None:
@@ -371,13 +371,13 @@ def validate_tool_params(tool_name: str, params: Dict[str, Any]) -> None:
 def execute_new_tool(parameter: str) -> ToolCallResult:
     """
     Implement the new tool functionality.
-    
+
     Args:
         parameter: Tool parameter
-        
+
     Returns:
         ToolCallResult containing execution results
-        
+
     Raises:
         ValueError: If parameter is invalid
         RuntimeError: If tool execution fails
@@ -385,7 +385,7 @@ def execute_new_tool(parameter: str) -> ToolCallResult:
     try:
         # Tool implementation
         result = perform_tool_operation(parameter)
-        
+
         return {
             "content": [
                 {
@@ -404,20 +404,20 @@ def execute_new_tool(parameter: str) -> ToolCallResult:
 ```python
 class TestNewTool:
     """Test new tool functionality."""
-    
+
     def test_new_tool_schema(self):
         """Test new tool schema definition."""
         tool_definitions = get_all_tool_definitions()
         tool = tool_definitions["new_tool"]
         assert tool["name"] == "new_tool"
         assert "parameter" in tool["inputSchema"]["properties"]
-    
+
     def test_new_tool_execution(self):
         """Test new tool execution."""
         result = execute_tool("new_tool", {"parameter": "test"})
         assert result["content"][0]["type"] == "text"
         # Additional assertions
-    
+
     def test_new_tool_validation(self):
         """Test new tool parameter validation."""
         with pytest.raises(ValueError, match="requires 'parameter'"):
@@ -434,17 +434,17 @@ try:
     # Tool operation
     result = perform_operation()
     return format_success_result(result)
-    
+
 except ValidationException as e:
     # Parameter validation errors
     logger.error("Validation error: %s", e)
     raise ValueError(f"Invalid parameters: {str(e)}") from e
-    
+
 except SpecificOperationError as e:
     # Tool-specific errors
     logger.error("Operation failed: %s", e)
     raise RuntimeError(f"Operation failed: {str(e)}") from e
-    
+
 except Exception as e:
     # Unexpected errors
     logger.error("Unexpected error: %s", e)
@@ -463,12 +463,12 @@ logger = logging.getLogger(__name__)
 def some_operation():
     """Example of proper logging usage."""
     logger.info("Starting operation with parameter: %s", param)
-    
+
     try:
         result = perform_operation(param)
         logger.debug("Operation completed successfully: %s", result)
         return result
-        
+
     except Exception as e:
         logger.error("Operation failed: %s", e, exc_info=True)
         raise
@@ -489,21 +489,21 @@ def some_operation():
 def example_function(param1: str, param2: int = 10) -> Dict[str, Any]:
     """
     Brief description of the function.
-    
+
     Longer description providing more context about the function's
     purpose and behavior.
-    
+
     Args:
         param1: Description of the first parameter.
         param2: Description of the second parameter with default value.
-        
+
     Returns:
         Description of the return value and its structure.
-        
+
     Raises:
         ValueError: When param1 is empty or invalid.
         RuntimeError: When the operation fails unexpectedly.
-        
+
     Example:
         >>> result = example_function("test", 20)
         >>> print(result["status"])
@@ -511,7 +511,7 @@ def example_function(param1: str, param2: int = 10) -> Dict[str, Any]:
     """
     if not param1:
         raise ValueError("param1 cannot be empty")
-        
+
     try:
         # Implementation
         return {"status": "success", "value": param1 * param2}
@@ -535,12 +535,12 @@ def typed_function(
     """Function with comprehensive type annotations."""
     if complex_param is None:
         complex_param = {}
-        
+
     # Implementation with type safety
     return {
         "content": [
             {
-                "type": "text", 
+                "type": "text",
                 "text": f"Result: {required_param}"
             }
         ]
@@ -555,7 +555,7 @@ Use conventional commit format for clear version history:
 type(scope): description
 
 feat(tools): add new clipboard history tool
-fix(server): handle malformed JSON gracefully  
+fix(server): handle malformed JSON gracefully
 docs(api): update protocol documentation with batch examples
 test(integration): add cross-platform clipboard tests
 style(format): apply black formatting to all modules
@@ -591,11 +591,11 @@ perf(clipboard): optimize platform detection logic
    # Format code
    poetry run black src/ tests/
    poetry run isort src/ tests/
-   
+
    # Validate quality
    poetry run flake8 src/ tests/
    poetry run mypy src/
-   
+
    # Run tests
    poetry run pytest --cov=mcp_clipboard_server
    ```
@@ -635,7 +635,7 @@ The project follows semantic versioning (SemVer):
    ```bash
    # Update version in pyproject.toml
    poetry version patch  # or minor, major
-   
+
    # Update CHANGELOG.md with changes
    # Commit version bump
    git add pyproject.toml CHANGELOG.md
@@ -708,22 +708,22 @@ def test_manual_interaction():
         stderr=subprocess.PIPE,
         text=True
     )
-    
+
     try:
         while True:
             # Get user input
             request_input = input("Enter JSON request (or 'quit'): ")
             if request_input.lower() == 'quit':
                 break
-            
+
             # Send request
             process.stdin.write(request_input + '\n')
             process.stdin.flush()
-            
+
             # Read response
             response = process.stdout.readline()
             print(f"Response: {response.strip()}")
-            
+
     except KeyboardInterrupt:
         print("Interrupted by user")
     finally:
@@ -769,7 +769,7 @@ print(detect_platform())
 which xclip && echo 'xclip available'
 which wl-copy && echo 'wl-copy available'
 
-# macOS  
+# macOS
 which pbcopy && echo 'pbcopy available'
 
 # Windows
@@ -788,23 +788,23 @@ from mcp_clipboard_server.server import MCPServer
 def profile_server():
     """Profile server performance."""
     server = MCPServer()
-    
+
     # Profile server operations
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Run test operations
     test_requests = [
         '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05"}}',
         '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}',
         '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_clipboard","arguments":{}}}',
     ]
-    
+
     for request in test_requests:
         server.handle_request(request)
-    
+
     profiler.disable()
-    
+
     # Generate performance report
     stats = pstats.Stats(profiler)
     stats.sort_stats('cumulative')
@@ -842,7 +842,7 @@ Validate documentation examples:
 # Test documentation examples
 def test_documentation_examples():
     """Verify that documentation examples work correctly."""
-    
+
     # Example from API documentation
     request = {
         "jsonrpc": "2.0",
@@ -853,7 +853,7 @@ def test_documentation_examples():
             "arguments": {}
         }
     }
-    
+
     # Validate example works
     from mcp_clipboard_server.tools import execute_tool
     result = execute_tool("get_clipboard", {})
