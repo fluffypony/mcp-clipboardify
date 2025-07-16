@@ -214,7 +214,7 @@ class TestPlatformSpecificIntegration:
         assert "Solution:" in error_msg
 
     @patch("mcp_clipboard_server.clipboard._get_platform_info")
-    @patch("mcp_clipboard_server.clipboard.set_clipboard")
+    @patch("mcp_clipboard_server._clipboard_utils.set_clipboard")
     def test_execute_with_wsl_error(self, mock_set, mock_platform):
         """Test tool execution with WSL-specific error."""
         mock_platform.return_value = "WSL (Windows Subsystem for Linux)"
