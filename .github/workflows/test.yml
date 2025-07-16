@@ -1,0 +1,198 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        exclude:
+          # Reduce matrix size while maintaining good coverage
+          - os: macos-latest
+            python-version: '3.8'
+          - os: macos-latest 
+            python-version: '3.9'
+          - os: windows-latest
+            python-version: '3.8'
+          - os: windows-latest
+            python-version: '3.9'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Setup clipboard dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xclip xsel xvfb
+        # Start virtual display for clipboard access
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 3
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+
+    - name: Run linting (Python 3.11+ only)
+      if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+      run: |
+        poetry run python -m flake8 src tests --max-line-length=100 --ignore=E203,W503
+        poetry run python -m black --check src tests
+        poetry run python -m isort --check-only src tests
+
+    - name: Run type checking (Python 3.11+ only)
+      if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+      run: |
+        poetry run python -m mypy src --ignore-missing-imports
+
+    - name: Run tests (Linux with display)
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        DISPLAY: :99
+        MCP_LOG_LEVEL: DEBUG
+      run: |
+        poetry run pytest tests/ -v --tb=short --durations=10
+
+    - name: Run tests (macOS)
+      if: matrix.os == 'macos-latest'
+      env:
+        MCP_LOG_LEVEL: DEBUG
+      run: |
+        # macOS CI may have clipboard restrictions, so we allow failures
+        poetry run pytest tests/ -v --tb=short --durations=10 || echo "Some tests may fail due to macOS CI clipboard restrictions"
+
+    - name: Run tests (Windows)
+      if: matrix.os == 'windows-latest'
+      env:
+        MCP_LOG_LEVEL: DEBUG
+      run: |
+        poetry run pytest tests/ -v --tb=short --durations=10
+
+    - name: Test package installation
+      run: |
+        poetry build
+        pip install dist/*.whl
+        
+        # Test CLI entry point
+        mcp-clipboard-server --help
+        
+        # Test module entry point
+        python -m mcp_clipboard_server --help
+
+    - name: Run platform-specific tests
+      run: |
+        poetry run pytest tests/test_platform_specific.py -v --tb=short -k "test_platform_detection or test_platform_guidance"
+
+  test-no-clipboard:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+
+    - name: Test without clipboard dependencies
+      env:
+        # No DISPLAY variable - simulates headless environment
+        MCP_LOG_LEVEL: DEBUG
+      run: |
+        # Should gracefully handle lack of clipboard access
+        poetry run pytest tests/test_platform_specific.py::TestClipboardFallbackHandling::test_get_clipboard_failure_returns_empty -v
+        poetry run pytest tests/test_platform_specific.py::TestClipboardFallbackHandling::test_set_clipboard_failure_raises_error -v
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+
+    - name: Run security scan
+      run: |
+        poetry run python -m pip install safety bandit
+        poetry run safety check
+        poetry run bandit -r src/ -f json || true
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Setup clipboard dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xclip xsel xvfb
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 3
+
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction
+        poetry run pip install coverage[toml] pytest-cov
+
+    - name: Run tests with coverage
+      env:
+        DISPLAY: :99
+        MCP_LOG_LEVEL: DEBUG
+      run: |
+        poetry run pytest tests/ --cov=src/mcp_clipboard_server --cov-report=xml --cov-report=html --cov-report=term-missing
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
