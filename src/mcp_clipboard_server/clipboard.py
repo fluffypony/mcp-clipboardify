@@ -12,9 +12,7 @@ from ._validators import validate_clipboard_text, ValidationException
 logger = logging.getLogger(__name__)
 
 
-class ClipboardError(Exception):
-    """Custom exception for clipboard operation failures."""
-    pass
+from ._errors import ClipboardError
 
 
 def _get_platform_info() -> str:

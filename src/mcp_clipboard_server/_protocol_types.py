@@ -7,8 +7,7 @@ except ImportError:
     # Python 3.7 compatibility
     from typing_extensions import TypedDict
 
-# Import JsonRpcError from protocol module
-from .protocol import JsonRpcError
+# Define JsonRpcError locally to avoid circular import
 
 
 # Basic types

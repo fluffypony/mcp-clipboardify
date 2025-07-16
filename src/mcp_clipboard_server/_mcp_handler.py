@@ -37,8 +37,7 @@ class MCPHandler:
         Returns:
             ServerInfo dictionary.
         """
-        # Import here to avoid circular import
-        from . import __version__
+        from ._version import __version__
         
         return {
             "name": "mcp-clipboard-server",

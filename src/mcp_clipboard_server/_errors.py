@@ -2,11 +2,25 @@
 
 import logging
 from typing import Dict, Type, Any
-from .protocol import ErrorCodes
-from .clipboard import ClipboardError
 from ._validators import ValidationException
 
+
+class ClipboardError(Exception):
+    """Custom exception for clipboard operation failures."""
+    pass
+
 logger = logging.getLogger(__name__)
+
+
+class ErrorCodes:
+    """JSON-RPC 2.0 and MCP-specific error codes."""
+    PARSE_ERROR = -32700
+    INVALID_REQUEST = -32600
+    METHOD_NOT_FOUND = -32601
+    INVALID_PARAMS = -32602
+    INTERNAL_ERROR = -32603
+    SERVER_ERROR = -32000
+    CLIPBOARD_ERROR = -32001
 
 
 # MCP-specific error codes (extending JSON-RPC standard codes)
@@ -86,7 +100,7 @@ def create_error_response_for_exception(request_id: Any, exception: Exception) -
     Returns:
         JSON-encoded error response.
     """
-    from .protocol import create_error_response
+    import json
     
     error_code = get_error_code_for_exception(exception)
     error_message = str(exception) or get_error_message(error_code)
@@ -94,7 +108,16 @@ def create_error_response_for_exception(request_id: Any, exception: Exception) -
     # Log the error for debugging
     logger.error(f"Error {error_code}: {error_message}", exc_info=exception)
     
-    return create_error_response(request_id, error_code, error_message)
+    # Create error response locally to avoid circular import
+    response = {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "error": {
+            "code": error_code,
+            "message": error_message
+        }
+    }
+    return json.dumps(response)
 
 
 def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
@@ -110,11 +133,17 @@ def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
     Returns:
         Either a success response or a JSON error response.
     """
-    from .protocol import create_success_response
+    import json
     try:
         result = operation(*args, **kwargs)
         logger.debug(f"Operation executed successfully")
-        return create_success_response(request_id, result)
+        # Create success response locally to avoid circular import
+        response = {
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": result
+        }
+        return json.dumps(response)
     except Exception as e:
         return create_error_response_for_exception(request_id, e)
 

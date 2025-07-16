@@ -32,7 +32,7 @@ classifiers = [
 packages = [{include = "mcp_clipboard_server", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = "^3.11"
 pyperclip = "^1.8.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -43,6 +43,9 @@ flake8 = "^6.1.0"
 black = "^23.11.0"
 isort = "^5.12.0"
 mypy = "^1.6.0"
+pylint = "^3.3.7"
+import-linter = "^2.3"
+radon = "^6.0.1"
 
 [tool.poetry.scripts]
 mcp-clipboard-server = "mcp_clipboard_server.__main__:main"

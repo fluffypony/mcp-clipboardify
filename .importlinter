@@ -3,13 +3,25 @@ root_package = src
 include_external_packages = True
 
 [importlinter:contract:1]
-name = Models should not import from higher layers
-type = forbidden
-source_modules =
-    src.models
+name = Core layers architecture
+type = layers
+layers =
+    src.mcp_clipboard_server.cli
+    src.mcp_clipboard_server.server
+    src.mcp_clipboard_server._mcp_handler
+    src.mcp_clipboard_server.tools
+    src.mcp_clipboard_server.protocol
+    src.mcp_clipboard_server.clipboard
+    src.mcp_clipboard_server._errors
+    src.mcp_clipboard_server._validators
+    src.mcp_clipboard_server._tool_schemas
+    src.mcp_clipboard_server._protocol_types
+    src.mcp_clipboard_server._logging_config
 
 [importlinter:contract:2]
 name = Tests should not be imported by production code
 type = forbidden
 source_modules =
-    src.models
+    src.mcp_clipboard_server
+forbidden_modules =
+    tests.*
