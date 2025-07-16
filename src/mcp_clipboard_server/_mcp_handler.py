@@ -7,7 +7,8 @@ from ._protocol_types import (
     ToolCallParams, ToolCallResult, ServerCapabilities, ServerInfo
 )
 from .protocol import JsonRpcRequest, ErrorCodes
-from ._tool_schemas import get_all_tool_definitions, validate_tool_exists
+from ._tool_schemas import get_all_tool_definitions, validate_tool_exists, get_tool_schema
+from ._validators import validate_with_json_schema, ValidationException
 from .clipboard import get_clipboard, set_clipboard, ClipboardError
 
 logger = logging.getLogger(__name__)
@@ -171,6 +172,12 @@ class MCPHandler:
             logger.debug(f"Tool {tool_name} executed successfully")
             return create_success_response(request.id, result)
             
+        except ValidationException as e:
+            logger.error(f"Invalid parameters for {tool_name}: {e}")
+            return create_error_response(
+                request.id, ErrorCodes.INVALID_PARAMS,
+                str(e)
+            )
         except ValueError as e:
             logger.error(f"Invalid parameters for {tool_name}: {e}")
             return create_error_response(
@@ -215,14 +222,14 @@ class MCPHandler:
             ToolCallResult containing the execution result.
             
         Raises:
-            ValueError: If parameters are invalid.
+            ValidationException: If parameters are invalid.
             ClipboardError: If clipboard operation fails.
         """
+        # Validate arguments against tool schema
+        schema = get_tool_schema(tool_name)
+        validate_with_json_schema(arguments, schema)
+        
         if tool_name == "get_clipboard":
-            # Validate no parameters
-            if arguments:
-                raise ValueError("get_clipboard does not accept parameters")
-            
             content = get_clipboard()
             logger.debug(f"Retrieved clipboard content: {len(content)} characters")
             
@@ -234,19 +241,7 @@ class MCPHandler:
             }
             
         elif tool_name == "set_clipboard":
-            # Validate required text parameter
-            if "text" not in arguments:
-                raise ValueError("set_clipboard requires 'text' parameter")
-            
             text = arguments["text"]
-            if not isinstance(text, str):
-                raise ValueError("'text' parameter must be a string")
-            
-            # Check for unexpected parameters
-            if len(arguments) > 1:
-                extra_params = set(arguments.keys()) - {"text"}
-                raise ValueError(f"Unexpected parameters: {list(extra_params)}")
-            
             set_clipboard(text)
             logger.debug(f"Set clipboard content: {len(text)} characters")
             
