@@ -315,7 +315,7 @@ class InstallationVerifier:
     def test_error_handling(self) -> bool:
         """Test error handling capabilities."""
         try:
-            from mcp_clipboard_server.validators import ValidationException
+            from mcp_clipboard_server._validators import ValidationException
 
             # Test that error classes are available
             self.log_test(
@@ -325,7 +325,7 @@ class InstallationVerifier:
             )
 
             # Test validation
-            from mcp_clipboard_server.validators import validate_clipboard_text
+            from mcp_clipboard_server._validators import validate_clipboard_text
 
             try:
                 # Test with extremely large text (should fail)
