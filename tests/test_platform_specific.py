@@ -339,7 +339,7 @@ class TestEdgeCases:
         # Test content near the 1MB validation limit
         long_content = "A" * (1024 * 1024 - 100)  # Just under 1MB
 
-        with patch("mcp_clipboard_server.clipboard.pyperclip.copy") as mock_copy:
+        with patch("mcp_clipboard_server.clipboard.pyperclip.copy"):
             with patch("mcp_clipboard_server.clipboard.pyperclip.paste") as mock_paste:
                 mock_paste.return_value = long_content
 
