@@ -5,7 +5,7 @@ import os
 import platform
 import pyperclip
 from typing import Optional
-from .validators import validate_clipboard_text, ValidationException
+from ._validators import validate_clipboard_text, ValidationException
 
 # Configure logging
 logger = logging.getLogger(__name__)

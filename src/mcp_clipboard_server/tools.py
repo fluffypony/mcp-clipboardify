@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 
 from .clipboard import get_clipboard, set_clipboard, ClipboardError
 from .protocol import ErrorCodes
-from .tool_schemas import get_all_tool_definitions, validate_tool_exists, get_tool_schema
+from ._tool_schemas import get_all_tool_definitions, validate_tool_exists, get_tool_schema
 
 # Configure logging
 logger = logging.getLogger(__name__)

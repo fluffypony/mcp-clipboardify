@@ -2,12 +2,12 @@
 
 import logging
 from typing import Dict, Any, Optional, Callable
-from .protocol_types import (
+from ._protocol_types import (
     JsonRpcId, InitializeParams, InitializeResult, ToolsListResult,
     ToolCallParams, ToolCallResult, ServerCapabilities, ServerInfo
 )
 from .protocol import JsonRpcRequest, ErrorCodes
-from .tool_schemas import get_all_tool_definitions, validate_tool_exists
+from ._tool_schemas import get_all_tool_definitions, validate_tool_exists
 from .clipboard import get_clipboard, set_clipboard, ClipboardError
 
 logger = logging.getLogger(__name__)

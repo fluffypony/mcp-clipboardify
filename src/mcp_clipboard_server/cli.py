@@ -13,7 +13,7 @@ except ImportError:
     # Python < 3.8 fallback
     from importlib_metadata import version, PackageNotFoundError
 
-from .logging_config import configure_third_party_loggers, setup_logging
+from ._logging_config import configure_third_party_loggers, setup_logging
 from .server import run_server
 
 # Global shutdown event for clean exit

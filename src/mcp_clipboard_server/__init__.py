@@ -10,8 +10,8 @@ except importlib.metadata.PackageNotFoundError:
     __version__ = "1.0.0-dev"
 
 # Export main components
-from .protocol_types import *
-from .mcp_handler import MCPHandler
+from ._protocol_types import *
+from ._mcp_handler import MCPHandler
 from .server import run_server
 from .clipboard import get_clipboard, set_clipboard, ClipboardError
-from .errors import MCPError, InitializationError, ValidationError
+from ._errors import MCPError, InitializationError, ValidationError
