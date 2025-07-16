@@ -166,36 +166,9 @@ class MCPHandler:
                 f"Unknown tool: {tool_name}"
             )
         
-        # Execute the tool
-        try:
-            result = self._execute_tool(tool_name, arguments)
-            logger.debug(f"Tool {tool_name} executed successfully")
-            return create_success_response(request.id, result)
-            
-        except ValidationException as e:
-            logger.error(f"Invalid parameters for {tool_name}: {e}")
-            return create_error_response(
-                request.id, ErrorCodes.INVALID_PARAMS,
-                str(e)
-            )
-        except ValueError as e:
-            logger.error(f"Invalid parameters for {tool_name}: {e}")
-            return create_error_response(
-                request.id, ErrorCodes.INVALID_PARAMS,
-                str(e)
-            )
-        except ClipboardError as e:
-            logger.error(f"Clipboard error in {tool_name}: {e}")
-            return create_error_response(
-                request.id, ErrorCodes.SERVER_ERROR,
-                f"Clipboard operation failed: {str(e)}"
-            )
-        except Exception as e:
-            logger.error(f"Unexpected error in {tool_name}: {e}")
-            return create_error_response(
-                request.id, ErrorCodes.INTERNAL_ERROR,
-                f"Tool execution failed: {str(e)}"
-            )
+        # Execute the tool using centralized error handling
+        from ._errors import safe_execute
+        return safe_execute(request.id, self._execute_tool, tool_name, arguments)
     
     def handle_ping(self, request: JsonRpcRequest) -> Optional[str]:
         """

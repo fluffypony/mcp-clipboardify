@@ -94,27 +94,14 @@ class ToolCallResult(TypedDict):
     content: List[TextContent]
 
 
-# JSON-RPC message types
-class JsonRpcRequest(TypedDict):
-    """JSON-RPC 2.0 request message."""
-    jsonrpc: str  # Always "2.0"
-    method: str
-    id: JsonRpcId
-    params: Optional[Dict[str, Any]]
-
+# JSON-RPC message types - using dataclass versions from protocol.py
+# JsonRpcRequest, JsonRpcError, JsonRpcResponse are defined in protocol.py as dataclasses
 
 class JsonRpcNotification(TypedDict):
     """JSON-RPC 2.0 notification message (no id field)."""
     jsonrpc: str  # Always "2.0"
     method: str
     params: Optional[Dict[str, Any]]
-
-
-class JsonRpcError(TypedDict, total=False):
-    """JSON-RPC 2.0 error object."""
-    code: int
-    message: str
-    data: Any
 
 
 class JsonRpcSuccessResponse(TypedDict):

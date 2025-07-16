@@ -4,6 +4,7 @@ import logging
 from typing import Dict, Type, Any
 from .protocol import ErrorCodes
 from .clipboard import ClipboardError
+from ._validators import ValidationException
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ ERROR_MESSAGES: Dict[int, str] = {
 # Exception to error code mapping
 EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], int] = {
     ValueError: MCPErrorCodes.INVALID_PARAMS,
+    ValidationException: MCPErrorCodes.INVALID_PARAMS,
     ClipboardError: MCPErrorCodes.CLIPBOARD_ERROR,
     TypeError: MCPErrorCodes.INVALID_PARAMS,
     KeyError: MCPErrorCodes.INVALID_PARAMS,
@@ -53,30 +55,7 @@ EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], int] = {
 }
 
 
-def get_error_code_for_exception(exception: Exception) -> int:
-    """
-    Map an exception to the appropriate JSON-RPC error code.
-    
-    Args:
-        exception: The exception that occurred.
-        
-    Returns:
-        Appropriate JSON-RPC error code.
-    """
-    exception_type = type(exception)
-    
-    # Check for exact type match first
-    if exception_type in EXCEPTION_TO_ERROR_CODE:
-        return EXCEPTION_TO_ERROR_CODE[exception_type]
-    
-    # Check for inheritance (e.g., custom ValueError subclasses)
-    for exc_type, error_code in EXCEPTION_TO_ERROR_CODE.items():
-        if isinstance(exception, exc_type):
-            return error_code
-    
-    # Default to internal error for unknown exceptions
-    logger.warning(f"Unknown exception type: {exception_type.__name__}")
-    return MCPErrorCodes.INTERNAL_ERROR
+
 
 
 def get_error_message(error_code: int, custom_message: str = None) -> str:
@@ -120,7 +99,7 @@ def create_error_response_for_exception(request_id: Any, exception: Exception) -
 
 def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
     """
-    Safely execute an operation and return appropriate error response if it fails.
+    Safely execute an operation and return appropriate response.
     
     Args:
         request_id: The ID from the original request.
@@ -129,10 +108,13 @@ def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
         **kwargs: Keyword arguments for the operation.
         
     Returns:
-        Either the operation result or a JSON error response.
+        Either a success response or a JSON error response.
     """
+    from .protocol import create_success_response
     try:
-        return operation(*args, **kwargs)
+        result = operation(*args, **kwargs)
+        logger.debug(f"Operation executed successfully")
+        return create_success_response(request_id, result)
     except Exception as e:
         return create_error_response_for_exception(request_id, e)
 
