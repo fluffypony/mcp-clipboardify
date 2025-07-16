@@ -2,7 +2,7 @@
 
 A [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.io/) server that provides clipboard access tools for AI assistants and automation workflows. Seamlessly integrate clipboard operations into your AI-powered applications.
 
-[![PyPI version](https://badge.fury.io/py/mcp-clipboardify.svg)](https://badge.fury.io/py/mcp-clipboardify)
+[![PyPI version](https://img.shields.io/pypi/v/mcp-clipboardify.svg)](https://pypi.org/project/mcp-clipboardify/)
 [![Python Support](https://img.shields.io/pypi/pyversions/mcp-clipboardify.svg)](https://pypi.org/project/mcp-clipboardify/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
