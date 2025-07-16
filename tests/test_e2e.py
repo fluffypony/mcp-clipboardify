@@ -488,3 +488,188 @@ def test_stress_multiple_requests(mcp_server):
         assert response["jsonrpc"] == "2.0"
         assert response["id"] == i + 2
         assert "result" in response
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Unix signal test")
+def test_platform_detection_unix():
+    """Test that server runs correctly on Unix-like platforms."""
+    with MCPServerProcess() as mcp_server:
+        # Basic initialization should work
+        request = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test-client", "version": "1.0.0"}
+            }
+        }
+        response = mcp_server.send_request(request)
+        assert response["jsonrpc"] == "2.0"
+        assert "result" in response
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
+def test_platform_detection_windows():
+    """Test that server runs correctly on Windows."""
+    with MCPServerProcess() as mcp_server:
+        # Basic initialization should work
+        request = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test-client", "version": "1.0.0"}
+            }
+        }
+        response = mcp_server.send_request(request)
+        assert response["jsonrpc"] == "2.0"
+        assert "result" in response
+
+
+def test_cross_platform_unicode_content():
+    """Test Unicode content handling across platforms."""
+    unicode_content = "Hello, 世界! 🌍 Café naïve résumé"
+    
+    with MCPServerProcess() as mcp_server:
+        # Initialize
+        init_request = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test-client", "version": "1.0.0"}
+            }
+        }
+        mcp_server.send_request(init_request)
+        
+        # Set Unicode clipboard content
+        set_request = {
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "tools/call",
+            "params": {
+                "name": "set_clipboard",
+                "arguments": {"text": unicode_content}
+            }
+        }
+        set_response = mcp_server.send_request(set_request)
+        
+        # May fail on some platforms, which is acceptable
+        if "result" in set_response:
+            # Get clipboard content back
+            get_request = {
+                "jsonrpc": "2.0", 
+                "id": 3,
+                "method": "tools/call",
+                "params": {
+                    "name": "get_clipboard",
+                    "arguments": {}
+                }
+            }
+            get_response = mcp_server.send_request(get_request)
+            
+            if "result" in get_response:
+                content = get_response["result"]["content"][0]["text"]
+                # Content should match or be empty (graceful fallback)
+                assert content == unicode_content or content == ""
+
+
+def test_large_content_handling():
+    """Test handling of large clipboard content."""
+    # Create content near the validation limit
+    large_content = "A" * (1024 * 100)  # 100KB
+    
+    with MCPServerProcess() as mcp_server:
+        # Initialize
+        init_request = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test-client", "version": "1.0.0"}
+            }
+        }
+        mcp_server.send_request(init_request)
+        
+        # Try to set large content
+        set_request = {
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "tools/call",
+            "params": {
+                "name": "set_clipboard",
+                "arguments": {"text": large_content}
+            }
+        }
+        set_response = mcp_server.send_request(set_request)
+        
+        # Should either succeed or fail gracefully
+        assert "result" in set_response or "error" in set_response
+        
+        if "result" in set_response:
+            # If set succeeded, try to get it back
+            get_request = {
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "tools/call",
+                "params": {
+                    "name": "get_clipboard",
+                    "arguments": {}
+                }
+            }
+            get_response = mcp_server.send_request(get_request)
+            
+            if "result" in get_response:
+                retrieved_content = get_response["result"]["content"][0]["text"]
+                # Content should match or be gracefully truncated/empty
+                assert isinstance(retrieved_content, str)
+                assert len(retrieved_content) <= len(large_content)
+
+
+def test_platform_error_recovery():
+    """Test that server recovers gracefully from platform-specific errors."""
+    with MCPServerProcess() as mcp_server:
+        # Initialize
+        init_request = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test-client", "version": "1.0.0"}
+            }
+        }
+        mcp_server.send_request(init_request)
+        
+        # Attempt multiple clipboard operations
+        for i in range(3):
+            # Get clipboard (should always work, returning empty string on failure)
+            get_request = {
+                "jsonrpc": "2.0",
+                "id": i + 2,
+                "method": "tools/call",
+                "params": {
+                    "name": "get_clipboard",
+                    "arguments": {}
+                }
+            }
+            get_response = mcp_server.send_request(get_request)
+            
+            # Should never cause server to crash
+            assert "result" in get_response or "error" in get_response
+            
+            if "result" in get_response:
+                content = get_response["result"]["content"][0]["text"]
+                assert isinstance(content, str)  # Should always be string
+        
+        # Server should still be responsive
+        assert mcp_server.process and mcp_server.process.poll() is None

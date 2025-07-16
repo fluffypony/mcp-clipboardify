@@ -173,3 +173,63 @@ class TestGetToolErrorCode:
         error = Exception("Generic error")
         code = get_tool_error_code(error)
         assert code == ErrorCodes.SERVER_ERROR
+
+
+class TestPlatformSpecificIntegration:
+    """Test platform-specific integration with tools."""
+
+    @patch('mcp_clipboard_server.tools.get_clipboard')
+    def test_execute_get_clipboard_platform_failure(self, mock_get):
+        """Test get_clipboard execution with platform-specific failure."""
+        # Simulate platform failure that returns empty string
+        mock_get.return_value = ""
+        
+        result = execute_tool("get_clipboard", {})
+        
+        assert result["content"][0]["type"] == "text"
+        assert result["content"][0]["text"] == ""
+        mock_get.assert_called_once()
+
+    @patch('mcp_clipboard_server.tools.set_clipboard')
+    def test_execute_set_clipboard_platform_error(self, mock_set):
+        """Test set_clipboard with enhanced platform error message."""
+        enhanced_error = ClipboardError(
+            "Failed to write to clipboard on Linux: xclip not found. "
+            "Solution: Missing clipboard utilities. Install with: sudo apt-get install xclip xsel"
+        )
+        mock_set.side_effect = enhanced_error
+        
+        with pytest.raises(RuntimeError) as exc_info:
+            execute_tool("set_clipboard", {"text": "hello"})
+        
+        error_msg = str(exc_info.value)
+        assert "Clipboard operation failed" in error_msg
+        assert "Linux" in error_msg
+        assert "Solution:" in error_msg
+
+    @patch('mcp_clipboard_server.clipboard._get_platform_info')
+    @patch('mcp_clipboard_server.tools.set_clipboard')
+    def test_execute_with_wsl_error(self, mock_set, mock_platform):
+        """Test tool execution with WSL-specific error."""
+        mock_platform.return_value = "WSL (Windows Subsystem for Linux)"
+        mock_set.side_effect = ClipboardError("WSL clipboard access limited")
+        
+        with pytest.raises(RuntimeError) as exc_info:
+            execute_tool("set_clipboard", {"text": "test"})
+        
+        error_msg = str(exc_info.value)
+        assert "WSL" in error_msg or "clipboard" in error_msg
+
+    def test_unicode_content_handling(self):
+        """Test handling of Unicode content through tools."""
+        unicode_text = "Hello, 世界! 🌍 Café naïve résumé"
+        
+        with patch('mcp_clipboard_server.tools.set_clipboard') as mock_set:
+            with patch('mcp_clipboard_server.tools.get_clipboard', return_value=unicode_text) as mock_get:
+                # Test setting Unicode content
+                result = execute_tool("set_clipboard", {"text": unicode_text})
+                mock_set.assert_called_once_with(unicode_text)
+                
+                # Test getting Unicode content
+                result = execute_tool("get_clipboard", {})
+                assert result["content"][0]["text"] == unicode_text
