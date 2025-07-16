@@ -31,7 +31,7 @@ A clear and concise description of what actually happened.
 **Platform Details:**
 - OS: [e.g. Ubuntu 22.04, Windows 11, macOS 13.0]
 - Python Version: [output of `python3 --version`]
-- Package Version: [output of `pip show mcp-clipboard-server`]
+- Package Version: [output of `pip show mcp-clipboardify`]
 - Terminal/Shell: [e.g. bash, PowerShell, zsh, iTerm2]
 
 **Clipboard Environment:**
@@ -45,7 +45,7 @@ Please run with debug logging and include the output:
 
 ```bash
 export MCP_LOG_LEVEL=DEBUG
-mcp-clipboard-server 2> debug.log
+mcp-clipboardify 2> debug.log
 
 # Reproduce the issue here
 
