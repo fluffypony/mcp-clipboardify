@@ -26,7 +26,7 @@ class TestClipboard:
     @patch("mcp_clipboard_server.clipboard.pyperclip.paste")
     def test_get_clipboard_failure(self, mock_paste):
         """Test clipboard read failure returns empty string gracefully."""
-        mock_paste.side_effect = Exception("Clipboard access denied")
+        mock_paste.side_effect = RuntimeError("Clipboard access denied")
         # Should return empty string instead of raising exception
         result = get_clipboard()
         assert result == ""
@@ -40,7 +40,7 @@ class TestClipboard:
     @patch("mcp_clipboard_server.clipboard.pyperclip.copy")
     def test_set_clipboard_failure(self, mock_copy):
         """Test clipboard write failure."""
-        mock_copy.side_effect = Exception("Clipboard access denied")
+        mock_copy.side_effect = RuntimeError("Clipboard access denied")
         with pytest.raises(ClipboardError, match="Failed to write to clipboard"):
             set_clipboard("test content")
 

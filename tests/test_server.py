@@ -115,7 +115,7 @@ class TestMCPServer:
         assert "error" in response
         assert response["error"]["code"] == ErrorCodes.INVALID_PARAMS
 
-    @patch("mcp_clipboard_server._mcp_handler.get_clipboard")
+    @patch("mcp_clipboard_server._clipboard_utils.get_clipboard")
     def test_handle_tools_call_success(self, mock_get_clipboard):
         """Test successful tools/call."""
         self.server.initialized = True
@@ -135,7 +135,7 @@ class TestMCPServer:
         assert "result" in response
         mock_get_clipboard.assert_called_once()
 
-    @patch("mcp_clipboard_server._mcp_handler.get_clipboard")
+    @patch("mcp_clipboard_server._clipboard_utils.get_clipboard")
     def test_handle_tools_call_tool_error(self, mock_get_clipboard):
         """Test tools/call with tool execution error."""
         self.server.initialized = True
@@ -205,7 +205,7 @@ class TestMCPServer:
 
         # 3. Call tool (mocked)
         with patch(
-            "mcp_clipboard_server._mcp_handler.get_clipboard"
+            "mcp_clipboard_server._clipboard_utils.get_clipboard"
         ) as mock_get_clipboard:
             mock_get_clipboard.return_value = "clipboard content"
 
