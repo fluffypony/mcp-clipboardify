@@ -7,7 +7,7 @@ try:
     __version__ = importlib.metadata.version("mcp-clipboard-server")
 except importlib.metadata.PackageNotFoundError:
     # Fallback version if package not installed
-    __version__ = "0.1.0-dev"
+    __version__ = "1.0.0-dev"
 
 # Export main components
 from .protocol_types import *

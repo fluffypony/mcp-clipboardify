@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "mcp-clipboard-server"
-version = "0.1.0"
+version = "1.0.0"
 description = "MCP server providing clipboard access tools for AI assistants and automation workflows"
 authors = ["MCP Clipboard Server Contributors"]
 maintainers = ["MCP Clipboard Server Contributors"]
