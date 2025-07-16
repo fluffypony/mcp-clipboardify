@@ -1,0 +1,15 @@
+[importlinter]
+root_package = src
+include_external_packages = True
+
+[importlinter:contract:1]
+name = Models should not import from higher layers
+type = forbidden
+source_modules =
+    src.models
+
+[importlinter:contract:2]
+name = Tests should not be imported by production code
+type = forbidden
+source_modules =
+    src.models

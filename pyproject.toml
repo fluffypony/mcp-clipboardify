@@ -1,0 +1,21 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "mcp-clipboard-server"
+version = "0.1.0"
+description = "MCP server providing clipboard access tools"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "mcp_clipboard_server", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyperclip = "^1.8.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[tool.poetry.scripts]
+mcp-clipboard-server = "mcp_clipboard_server.__main__:main"

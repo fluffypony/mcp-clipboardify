@@ -1,0 +1,59 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests]
+        args: [--ignore-missing-imports]
+        exclude: ^(tests/.*)$
+        files: ^src/
+
+  - repo: local
+    hooks:
+      - id: vulture
+        name: vulture
+        entry: poetry run vulture
+        language: system
+        types: [python]
+        args: [--min-confidence, "100", .vulture-whitelist]
+        exclude: ^(tests/.*)$
+
+      - id: bandit
+        name: bandit
+        entry: poetry run bandit
+        language: system
+        types: [python]
+        args: [--skip, "B101,B106,B311,B601,B603,B604,B607,B608"]
+        exclude: ^(tests/.*)$
+
+      - id: import-linter
+        name: import-linter
+        entry: poetry run lint-imports
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint
+        language: system
+        types: [python]
+        args: [--fail-under=9.5]
+        exclude: ^(tests/.*)$

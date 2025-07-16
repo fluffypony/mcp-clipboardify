@@ -1,0 +1,5 @@
+[radon]
+exclude = tests/*,migrations/*
+average = true
+show_complexity = true
+order = SCORE
