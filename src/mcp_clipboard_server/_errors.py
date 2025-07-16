@@ -1,5 +1,6 @@
 """Centralized error handling and code definitions for MCP server."""
 
+import json
 import logging
 from typing import Dict, Type, Any
 from ._validators import ValidationException
@@ -7,13 +8,14 @@ from ._validators import ValidationException
 
 class ClipboardError(Exception):
     """Custom exception for clipboard operation failures."""
-    pass
+
 
 logger = logging.getLogger(__name__)
 
 
-class ErrorCodes:
+class ErrorCodes:  # pylint: disable=too-few-public-methods
     """JSON-RPC 2.0 and MCP-specific error codes."""
+
     PARSE_ERROR = -32700
     INVALID_REQUEST = -32600
     METHOD_NOT_FOUND = -32601
@@ -24,23 +26,23 @@ class ErrorCodes:
 
 
 # MCP-specific error codes (extending JSON-RPC standard codes)
-class MCPErrorCodes:
+class MCPErrorCodes:  # pylint: disable=too-few-public-methods
     """Extended error codes for MCP-specific errors."""
-    
+
     # Standard JSON-RPC 2.0 error codes
-    PARSE_ERROR = ErrorCodes.PARSE_ERROR           # -32700
-    INVALID_REQUEST = ErrorCodes.INVALID_REQUEST   # -32600
-    METHOD_NOT_FOUND = ErrorCodes.METHOD_NOT_FOUND # -32601
-    INVALID_PARAMS = ErrorCodes.INVALID_PARAMS     # -32602
-    INTERNAL_ERROR = ErrorCodes.INTERNAL_ERROR     # -32603
-    
+    PARSE_ERROR = ErrorCodes.PARSE_ERROR  # -32700
+    INVALID_REQUEST = ErrorCodes.INVALID_REQUEST  # -32600
+    METHOD_NOT_FOUND = ErrorCodes.METHOD_NOT_FOUND  # -32601
+    INVALID_PARAMS = ErrorCodes.INVALID_PARAMS  # -32602
+    INTERNAL_ERROR = ErrorCodes.INTERNAL_ERROR  # -32603
+
     # MCP server errors
-    SERVER_ERROR = ErrorCodes.SERVER_ERROR         # -32000
-    
+    SERVER_ERROR = ErrorCodes.SERVER_ERROR  # -32000
+
     # Custom application errors (in the reserved range -32099 to -32000)
-    CLIPBOARD_ERROR = -32001                       # Clipboard operation failed
-    VALIDATION_ERROR = -32002                      # Parameter validation failed
-    INITIALIZATION_ERROR = -32003                  # Server not initialized
+    CLIPBOARD_ERROR = -32001  # Clipboard operation failed
+    VALIDATION_ERROR = -32002  # Parameter validation failed
+    INITIALIZATION_ERROR = -32003  # Server not initialized
 
 
 # Error code to message mapping
@@ -69,53 +71,45 @@ EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], int] = {
 }
 
 
-
-
-
 def get_error_message(error_code: int, custom_message: str = None) -> str:
     """
     Get a human-readable error message for an error code.
-    
+
     Args:
         error_code: The JSON-RPC error code.
         custom_message: Optional custom message to use instead of default.
-        
+
     Returns:
         Error message string.
     """
     if custom_message:
         return custom_message
-    
+
     return ERROR_MESSAGES.get(error_code, "Unknown error")
 
 
 def create_error_response_for_exception(request_id: Any, exception: Exception) -> str:
     """
     Create a JSON-RPC error response for an exception.
-    
+
     Args:
         request_id: The ID from the original request.
         exception: The exception that occurred.
-        
+
     Returns:
         JSON-encoded error response.
     """
-    import json
-    
     error_code = get_error_code_for_exception(exception)
     error_message = str(exception) or get_error_message(error_code)
-    
+
     # Log the error for debugging
-    logger.error(f"Error {error_code}: {error_message}", exc_info=exception)
-    
+    logger.error("Error %s: %s", error_code, error_message, exc_info=exception)
+
     # Create error response locally to avoid circular import
     response = {
         "jsonrpc": "2.0",
         "id": request_id,
-        "error": {
-            "code": error_code,
-            "message": error_message
-        }
+        "error": {"code": error_code, "message": error_message},
     }
     return json.dumps(response)
 
@@ -123,26 +117,21 @@ def create_error_response_for_exception(request_id: Any, exception: Exception) -
 def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
     """
     Safely execute an operation and return appropriate response.
-    
+
     Args:
         request_id: The ID from the original request.
         operation: The operation to execute.
         *args: Positional arguments for the operation.
         **kwargs: Keyword arguments for the operation.
-        
+
     Returns:
         Either a success response or a JSON error response.
     """
-    import json
     try:
         result = operation(*args, **kwargs)
-        logger.debug(f"Operation executed successfully")
+        logger.debug("Operation executed successfully")
         # Create success response locally to avoid circular import
-        response = {
-            "jsonrpc": "2.0",
-            "id": request_id,
-            "result": result
-        }
+        response = {"jsonrpc": "2.0", "id": request_id, "result": result}
         return json.dumps(response)
     except Exception as e:
         return create_error_response_for_exception(request_id, e)
@@ -150,11 +139,11 @@ def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
 
 class MCPError(Exception):
     """Base exception class for MCP-specific errors."""
-    
+
     def __init__(self, message: str, error_code: int = MCPErrorCodes.SERVER_ERROR):
         """
         Initialize MCP error.
-        
+
         Args:
             message: Error message.
             error_code: JSON-RPC error code.
@@ -165,43 +154,45 @@ class MCPError(Exception):
 
 class InitializationError(MCPError):
     """Raised when server is not properly initialized."""
-    
+
     def __init__(self, message: str = "Server not initialized"):
         super().__init__(message, MCPErrorCodes.INITIALIZATION_ERROR)
 
 
 class ValidationError(MCPError):
     """Raised when parameter validation fails."""
-    
+
     def __init__(self, message: str):
         super().__init__(message, MCPErrorCodes.VALIDATION_ERROR)
 
 
 # Update exception mapping to include custom exceptions
-EXCEPTION_TO_ERROR_CODE.update({
-    MCPError: lambda e: e.error_code,
-    InitializationError: MCPErrorCodes.INITIALIZATION_ERROR,
-    ValidationError: MCPErrorCodes.VALIDATION_ERROR,
-})
+EXCEPTION_TO_ERROR_CODE.update(
+    {
+        MCPError: lambda e: e.error_code,
+        InitializationError: MCPErrorCodes.INITIALIZATION_ERROR,
+        ValidationError: MCPErrorCodes.VALIDATION_ERROR,
+    }
+)
 
 
 def get_error_code_for_exception(exception: Exception) -> int:
     """
     Map an exception to the appropriate JSON-RPC error code.
     Updated to handle custom MCP exceptions.
-    
+
     Args:
         exception: The exception that occurred.
-        
+
     Returns:
         Appropriate JSON-RPC error code.
     """
     exception_type = type(exception)
-    
+
     # Handle custom MCP exceptions with error_code attribute
-    if hasattr(exception, 'error_code'):
+    if hasattr(exception, "error_code"):
         return exception.error_code
-    
+
     # Check for exact type match first
     if exception_type in EXCEPTION_TO_ERROR_CODE:
         error_code = EXCEPTION_TO_ERROR_CODE[exception_type]
@@ -209,14 +200,12 @@ def get_error_code_for_exception(exception: Exception) -> int:
         if callable(error_code):
             return error_code(exception)
         return error_code
-    
+
     # Check for inheritance (e.g., custom ValueError subclasses)
     for exc_type, error_code in EXCEPTION_TO_ERROR_CODE.items():
         if isinstance(exception, exc_type):
-            if callable(error_code):
-                return error_code(exception)
             return error_code
-    
+
     # Default to internal error for unknown exceptions
-    logger.warning(f"Unknown exception type: {exception_type.__name__}")
+    logger.warning("Unknown exception type: %s", exception_type.__name__)
     return MCPErrorCodes.INTERNAL_ERROR

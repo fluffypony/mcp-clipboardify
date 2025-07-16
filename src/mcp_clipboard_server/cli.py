@@ -1,6 +1,7 @@
 """Command-line interface for MCP clipboard server."""
 
 import argparse
+import io
 import logging
 import signal
 import sys
@@ -20,10 +21,10 @@ from .server import run_server
 shutdown_event = threading.Event()
 
 
-def signal_handler(signum: int, frame) -> None:
+def signal_handler(signum: int, _frame) -> None:
     """Handle shutdown signals gracefully."""
     logger = logging.getLogger(__name__)
-    logger.info(f"Received signal {signum}, initiating graceful shutdown")
+    logger.info("Received signal %s, initiating graceful shutdown", signum)
     shutdown_event.set()
 
 
@@ -31,7 +32,7 @@ def setup_signal_handlers() -> None:
     """Register signal handlers for graceful shutdown."""
     # Register SIGINT (Ctrl+C) and SIGTERM handlers
     signal.signal(signal.SIGINT, signal_handler)
-    if hasattr(signal, 'SIGTERM'):  # Windows doesn't have SIGTERM
+    if hasattr(signal, "SIGTERM"):  # Windows doesn't have SIGTERM
         signal.signal(signal.SIGTERM, signal_handler)
 
 
@@ -53,50 +54,47 @@ def create_parser() -> argparse.ArgumentParser:
 Examples:
   mcp-clipboard-server                    # Start the server
   python -m mcp_clipboard_server          # Alternative startup method
-  
+
 Environment Variables:
   MCP_LOG_LEVEL    Set logging level (DEBUG, INFO, WARNING, ERROR)
   MCP_LOG_JSON     Use JSON logging format (true/false)
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        "--version",
-        action="version",
-        version=f"%(prog)s {get_package_version()}"
+        "--version", action="version", version=f"%(prog)s {get_package_version()}"
     )
-    
+
     return parser
 
 
 def main(args: list[str] | None = None) -> NoReturn:
     """Main CLI entry point."""
     parser = create_parser()
-    parsed_args = parser.parse_args(args)
-    
+    _ = parser.parse_args(args)
+
     # Force UTF-8 encoding on Windows to handle Unicode clipboard content
     if sys.platform == "win32":
-        import io
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-    
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
+
     # Setup logging and signal handlers
     setup_logging()
     configure_third_party_loggers()
     setup_signal_handlers()
-    
+
     logger = logging.getLogger(__name__)
     logger.info("Starting MCP clipboard server")
-    
+
     try:
         run_server(shutdown_event)
     except KeyboardInterrupt:
         logger.info("Received keyboard interrupt, shutting down")
         sys.exit(0)
     except Exception as e:
-        logger.error(f"Fatal error: {e}", exc_info=True)
+        logger.error("Fatal error: %s", e, exc_info=True)
         sys.exit(1)
-    
+
     logger.info("Server shutdown complete")
     sys.exit(0)
 

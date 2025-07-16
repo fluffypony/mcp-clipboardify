@@ -1,11 +1,13 @@
 """Tests for MCP tool implementations."""
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from mcp_clipboard_server.tools import (
-    list_tools, validate_tool_params, execute_tool, 
-    get_tool_error_code
+    list_tools,
+    validate_tool_params,
+    execute_tool,
+    get_tool_error_code,
 )
 from mcp_clipboard_server._tool_schemas import get_all_tool_definitions
 from mcp_clipboard_server.clipboard import ClipboardError
@@ -102,39 +104,39 @@ class TestValidateToolParams:
 class TestExecuteTool:
     """Test tool execution."""
 
-    @patch('mcp_clipboard_server.tools.get_clipboard')
+    @patch("mcp_clipboard_server.tools.get_clipboard")
     def test_execute_get_clipboard_success(self, mock_get):
         """Test successful get_clipboard execution."""
         mock_get.return_value = "test content"
-        
+
         result = execute_tool("get_clipboard", {})
-        
+
         assert result["content"][0]["type"] == "text"
         assert result["content"][0]["text"] == "test content"
         mock_get.assert_called_once()
 
-    @patch('mcp_clipboard_server.tools.get_clipboard')
+    @patch("mcp_clipboard_server.tools.get_clipboard")
     def test_execute_get_clipboard_failure(self, mock_get):
         """Test get_clipboard with clipboard error."""
         mock_get.side_effect = ClipboardError("Access denied")
-        
+
         with pytest.raises(RuntimeError, match="Clipboard operation failed"):
             execute_tool("get_clipboard", {})
 
-    @patch('mcp_clipboard_server.tools.set_clipboard')
+    @patch("mcp_clipboard_server.tools.set_clipboard")
     def test_execute_set_clipboard_success(self, mock_set):
         """Test successful set_clipboard execution."""
         result = execute_tool("set_clipboard", {"text": "hello world"})
-        
+
         assert result["content"][0]["type"] == "text"
         assert "Successfully copied 11 characters" in result["content"][0]["text"]
         mock_set.assert_called_once_with("hello world")
 
-    @patch('mcp_clipboard_server.tools.set_clipboard')
+    @patch("mcp_clipboard_server.tools.set_clipboard")
     def test_execute_set_clipboard_failure(self, mock_set):
         """Test set_clipboard with clipboard error."""
         mock_set.side_effect = ClipboardError("Access denied")
-        
+
         with pytest.raises(RuntimeError, match="Clipboard operation failed"):
             execute_tool("set_clipboard", {"text": "hello"})
 
@@ -148,11 +150,11 @@ class TestExecuteTool:
         with pytest.raises(ValueError, match="does not accept parameters"):
             execute_tool("get_clipboard", {"extra": "param"})
 
-    @patch('mcp_clipboard_server.tools.get_clipboard')
+    @patch("mcp_clipboard_server.tools.get_clipboard")
     def test_execute_unexpected_error(self, mock_get):
         """Test handling of unexpected errors."""
         mock_get.side_effect = Exception("Unexpected error")
-        
+
         with pytest.raises(RuntimeError, match="Tool execution failed"):
             execute_tool("get_clipboard", {})
 
@@ -182,19 +184,19 @@ class TestGetToolErrorCode:
 class TestPlatformSpecificIntegration:
     """Test platform-specific integration with tools."""
 
-    @patch('mcp_clipboard_server.tools.get_clipboard')
+    @patch("mcp_clipboard_server.tools.get_clipboard")
     def test_execute_get_clipboard_platform_failure(self, mock_get):
         """Test get_clipboard execution with platform-specific failure."""
         # Simulate platform failure that returns empty string
         mock_get.return_value = ""
-        
+
         result = execute_tool("get_clipboard", {})
-        
+
         assert result["content"][0]["type"] == "text"
         assert result["content"][0]["text"] == ""
         mock_get.assert_called_once()
 
-    @patch('mcp_clipboard_server.tools.set_clipboard')
+    @patch("mcp_clipboard_server.tools.set_clipboard")
     def test_execute_set_clipboard_platform_error(self, mock_set):
         """Test set_clipboard with enhanced platform error message."""
         enhanced_error = ClipboardError(
@@ -202,38 +204,40 @@ class TestPlatformSpecificIntegration:
             "Solution: Missing clipboard utilities. Install with: sudo apt-get install xclip xsel"
         )
         mock_set.side_effect = enhanced_error
-        
+
         with pytest.raises(RuntimeError) as exc_info:
             execute_tool("set_clipboard", {"text": "hello"})
-        
+
         error_msg = str(exc_info.value)
         assert "Clipboard operation failed" in error_msg
         assert "Linux" in error_msg
         assert "Solution:" in error_msg
 
-    @patch('mcp_clipboard_server.clipboard._get_platform_info')
-    @patch('mcp_clipboard_server.tools.set_clipboard')
+    @patch("mcp_clipboard_server.clipboard._get_platform_info")
+    @patch("mcp_clipboard_server.tools.set_clipboard")
     def test_execute_with_wsl_error(self, mock_set, mock_platform):
         """Test tool execution with WSL-specific error."""
         mock_platform.return_value = "WSL (Windows Subsystem for Linux)"
         mock_set.side_effect = ClipboardError("WSL clipboard access limited")
-        
+
         with pytest.raises(RuntimeError) as exc_info:
             execute_tool("set_clipboard", {"text": "test"})
-        
+
         error_msg = str(exc_info.value)
         assert "WSL" in error_msg or "clipboard" in error_msg
 
     def test_unicode_content_handling(self):
         """Test handling of Unicode content through tools."""
         unicode_text = "Hello, 世界! 🌍 Café naïve résumé"
-        
-        with patch('mcp_clipboard_server.tools.set_clipboard') as mock_set:
-            with patch('mcp_clipboard_server.tools.get_clipboard', return_value=unicode_text) as mock_get:
+
+        with patch("mcp_clipboard_server.tools.set_clipboard") as mock_set:
+            with patch(
+                "mcp_clipboard_server.tools.get_clipboard", return_value=unicode_text
+            ) as mock_get:
                 # Test setting Unicode content
                 result = execute_tool("set_clipboard", {"text": unicode_text})
                 mock_set.assert_called_once_with(unicode_text)
-                
+
                 # Test getting Unicode content
                 result = execute_tool("get_clipboard", {})
                 assert result["content"][0]["text"] == unicode_text

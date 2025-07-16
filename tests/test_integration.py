@@ -19,17 +19,17 @@ class MCPIntegrationTest:
     def start_server(self):
         """Start the MCP server as a subprocess."""
         self.process = subprocess.Popen(
-            [sys.executable, '-m', 'mcp_clipboard_server'],
+            [sys.executable, "-m", "mcp_clipboard_server"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            bufsize=0  # Unbuffered for real-time communication
+            bufsize=0,  # Unbuffered for real-time communication
         )
-        
+
         # Give the server a moment to start
         time.sleep(0.1)
-        
+
         if self.process.poll() is not None:
             stderr_output = self.process.stderr.read()
             raise RuntimeError(f"Server failed to start: {stderr_output}")
@@ -48,10 +48,10 @@ class MCPIntegrationTest:
     def send_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
         Send a JSON-RPC request and get the response.
-        
+
         Args:
             request: JSON-RPC request dictionary.
-            
+
         Returns:
             JSON-RPC response dictionary.
         """
@@ -59,7 +59,7 @@ class MCPIntegrationTest:
             raise RuntimeError("Server not started")
 
         # Send request
-        request_json = json.dumps(request) + '\n'
+        request_json = json.dumps(request) + "\n"
         self.process.stdin.write(request_json)
         self.process.stdin.flush()
 
@@ -107,10 +107,10 @@ def test_mcp_handshake():
             "method": "initialize",
             "params": {
                 "protocolVersion": "0.8.0",
-                "clientInfo": {"name": "test-client", "version": "1.0.0"}
-            }
+                "clientInfo": {"name": "test-client", "version": "1.0.0"},
+            },
         }
-        
+
         init_response = test.send_request(init_request)
         assert init_response["jsonrpc"] == "2.0"
         assert init_response["id"] == 1
@@ -120,18 +120,14 @@ def test_mcp_handshake():
         assert "capabilities" in init_response["result"]
 
         # 2. List tools
-        list_request = {
-            "jsonrpc": "2.0",
-            "id": 2,
-            "method": "tools/list"
-        }
-        
+        list_request = {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
+
         list_response = test.send_request(list_request)
         assert list_response["jsonrpc"] == "2.0"
         assert list_response["id"] == 2
         assert "result" in list_response
         assert "tools" in list_response["result"]
-        
+
         tools = list_response["result"]["tools"]
         assert len(tools) == 2
         tool_names = [tool["name"] for tool in tools]
@@ -142,14 +138,14 @@ def test_mcp_handshake():
 def test_clipboard_operations():
     """Test actual clipboard read/write operations."""
     test_text = "Integration test content 🚀"
-    
+
     with MCPIntegrationTest() as test:
         # Initialize first
         init_request = {
             "jsonrpc": "2.0",
             "id": 1,
             "method": "initialize",
-            "params": {"protocolVersion": "0.8.0"}
+            "params": {"protocolVersion": "0.8.0"},
         }
         test.send_request(init_request)
 
@@ -158,18 +154,15 @@ def test_clipboard_operations():
             "jsonrpc": "2.0",
             "id": 2,
             "method": "tools/call",
-            "params": {
-                "name": "set_clipboard",
-                "arguments": {"text": test_text}
-            }
+            "params": {"name": "set_clipboard", "arguments": {"text": test_text}},
         }
-        
+
         set_response = test.send_request(set_request)
         assert set_response["jsonrpc"] == "2.0"
         assert set_response["id"] == 2
         assert "result" in set_response
         assert "content" in set_response["result"]
-        
+
         # Verify clipboard was actually set by reading it directly
         actual_clipboard = pyperclip.paste()
         assert actual_clipboard == test_text
@@ -179,18 +172,15 @@ def test_clipboard_operations():
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {
-                "name": "get_clipboard",
-                "arguments": {}
-            }
+            "params": {"name": "get_clipboard", "arguments": {}},
         }
-        
+
         get_response = test.send_request(get_request)
         assert get_response["jsonrpc"] == "2.0"
         assert get_response["id"] == 3
         assert "result" in get_response
         assert "content" in get_response["result"]
-        
+
         content = get_response["result"]["content"][0]
         assert content["type"] == "text"
         assert content["text"] == test_text
@@ -204,23 +194,15 @@ def test_error_handling():
             "jsonrpc": "2.0",
             "id": 1,
             "method": "tools/call",
-            "params": {
-                "name": "get_clipboard",
-                "arguments": {}
-            }
+            "params": {"name": "get_clipboard", "arguments": {}},
         }
-        
+
         response = test.send_request(premature_request)
         assert "error" in response
         assert response["error"]["code"] == -32000  # Server error
 
         # Initialize
-        init_request = {
-            "jsonrpc": "2.0",
-            "id": 2,
-            "method": "initialize",
-            "params": {}
-        }
+        init_request = {"jsonrpc": "2.0", "id": 2, "method": "initialize", "params": {}}
         test.send_request(init_request)
 
         # Call unknown tool
@@ -228,12 +210,9 @@ def test_error_handling():
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {
-                "name": "unknown_tool",
-                "arguments": {}
-            }
+            "params": {"name": "unknown_tool", "arguments": {}},
         }
-        
+
         response = test.send_request(unknown_tool_request)
         assert "error" in response
         assert response["error"]["code"] == -32602  # Invalid params
@@ -243,12 +222,9 @@ def test_error_handling():
             "jsonrpc": "2.0",
             "id": 4,
             "method": "tools/call",
-            "params": {
-                "name": "set_clipboard",
-                "arguments": {"wrong_param": "value"}
-            }
+            "params": {"name": "set_clipboard", "arguments": {"wrong_param": "value"}},
         }
-        
+
         response = test.send_request(invalid_params_request)
         assert "error" in response
         assert response["error"]["code"] == -32602  # Invalid params
@@ -261,7 +237,7 @@ def test_malformed_json():
         if test.process:
             test.process.stdin.write('{"malformed": json}\n')
             test.process.stdin.flush()
-            
+
             response_line = test.process.stdout.readline()
             if response_line:
                 response = json.loads(response_line.strip())
@@ -273,12 +249,7 @@ def test_unknown_method():
     """Test handling of unknown methods."""
     with MCPIntegrationTest() as test:
         # Initialize first
-        init_request = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {}
-        }
+        init_request = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
         test.send_request(init_request)
 
         # Call unknown method
@@ -286,9 +257,9 @@ def test_unknown_method():
             "jsonrpc": "2.0",
             "id": 2,
             "method": "unknown/method",
-            "params": {}
+            "params": {},
         }
-        
+
         response = test.send_request(unknown_method_request)
         assert "error" in response
         assert response["error"]["code"] == -32601  # Method not found
@@ -298,35 +269,23 @@ def test_notification_handling():
     """Test handling of JSON-RPC notifications."""
     with MCPIntegrationTest() as test:
         # Initialize first
-        init_request = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {}
-        }
+        init_request = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
         test.send_request(init_request)
 
         # Send ping notification (no ID)
-        ping_notification = {
-            "jsonrpc": "2.0",
-            "method": "$/ping"
-        }
-        
+        ping_notification = {"jsonrpc": "2.0", "method": "$/ping"}
+
         if test.process:
-            notification_json = json.dumps(ping_notification) + '\n'
+            notification_json = json.dumps(ping_notification) + "\n"
             test.process.stdin.write(notification_json)
             test.process.stdin.flush()
-            
+
             # Brief wait to ensure notification is processed
             time.sleep(0.1)
-            
+
             # Send a regular request to verify server is still responsive
-            status_request = {
-                "jsonrpc": "2.0",
-                "id": 2,
-                "method": "tools/list"
-            }
-            
+            status_request = {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
+
             response = test.send_request(status_request)
             assert response["id"] == 2
             assert "result" in response
@@ -335,15 +294,10 @@ def test_notification_handling():
 def test_unicode_clipboard_content():
     """Test handling of Unicode content in clipboard."""
     unicode_text = "Hello 🌍 こんにちは 🚀 مرحبا"
-    
+
     with MCPIntegrationTest() as test:
         # Initialize
-        init_request = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {}
-        }
+        init_request = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
         test.send_request(init_request)
 
         # Set Unicode content
@@ -351,12 +305,9 @@ def test_unicode_clipboard_content():
             "jsonrpc": "2.0",
             "id": 2,
             "method": "tools/call",
-            "params": {
-                "name": "set_clipboard",
-                "arguments": {"text": unicode_text}
-            }
+            "params": {"name": "set_clipboard", "arguments": {"text": unicode_text}},
         }
-        
+
         set_response = test.send_request(set_request)
         assert "result" in set_response
 
@@ -365,15 +316,12 @@ def test_unicode_clipboard_content():
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {
-                "name": "get_clipboard",
-                "arguments": {}
-            }
+            "params": {"name": "get_clipboard", "arguments": {}},
         }
-        
+
         get_response = test.send_request(get_request)
         assert "result" in get_response
-        
+
         content = get_response["result"]["content"][0]
         assert content["text"] == unicode_text
 
@@ -383,12 +331,12 @@ def test_unicode_clipboard_content():
 def test_server_startup_and_shutdown():
     """Test that server starts and shuts down cleanly."""
     test = MCPIntegrationTest()
-    
+
     # Test startup
     test.start_server()
     assert test.process is not None
     assert test.process.poll() is None  # Should be running
-    
+
     # Test shutdown
     test.stop_server()
     assert test.process.poll() is not None  # Should have terminated
@@ -397,27 +345,28 @@ def test_server_startup_and_shutdown():
 if __name__ == "__main__":
     # Run tests individually for debugging
     print("Running MCP integration tests...")
-    
+
     try:
         test_server_startup_and_shutdown()
         print("✓ Server startup/shutdown test passed")
-        
+
         test_mcp_handshake()
         print("✓ MCP handshake test passed")
-        
+
         test_clipboard_operations()
         print("✓ Clipboard operations test passed")
-        
+
         test_error_handling()
         print("✓ Error handling test passed")
-        
+
         test_unicode_clipboard_content()
         print("✓ Unicode content test passed")
-        
+
         print("\nAll integration tests passed! 🎉")
-        
+
     except Exception as e:
         print(f"❌ Integration test failed: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

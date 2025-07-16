@@ -3,8 +3,13 @@
 import json
 import pytest
 from mcp_clipboard_server.protocol import (
-    JsonRpcRequest, JsonRpcError, JsonRpcResponse, ErrorCodes,
-    parse_json_rpc_message, create_success_response, create_error_response
+    JsonRpcRequest,
+    JsonRpcError,
+    JsonRpcResponse,
+    ErrorCodes,
+    parse_json_rpc_message,
+    create_success_response,
+    create_error_response,
 )
 
 
@@ -26,7 +31,7 @@ class TestJsonRpcRequest:
             "jsonrpc": "2.0",
             "method": "test",
             "id": "test-id",
-            "params": {"arg1": "value1"}
+            "params": {"arg1": "value1"},
         }
         request = JsonRpcRequest.from_dict(data)
         assert request.params == {"arg1": "value1"}
@@ -43,12 +48,14 @@ class TestJsonRpcError:
 
     def test_to_dict_with_data(self):
         """Test converting error to dict with data."""
-        error = JsonRpcError(code=-32600, message="Invalid Request", data={"detail": "missing field"})
+        error = JsonRpcError(
+            code=-32600, message="Invalid Request", data={"detail": "missing field"}
+        )
         result = error.to_dict()
         expected = {
             "code": -32600,
             "message": "Invalid Request",
-            "data": {"detail": "missing field"}
+            "data": {"detail": "missing field"},
         }
         assert result == expected
 
@@ -71,7 +78,7 @@ class TestJsonRpcResponse:
         expected = {
             "jsonrpc": "2.0",
             "id": 1,
-            "error": {"code": -32600, "message": "Invalid Request"}
+            "error": {"code": -32600, "message": "Invalid Request"},
         }
         assert result == expected
 
@@ -96,7 +103,9 @@ class TestParseJsonRpcMessage:
     def test_parse_non_object(self):
         """Test parsing JSON array instead of object."""
         data = '["not", "an", "object"]'
-        with pytest.raises(ValueError, match="Invalid request: batch items must be JSON objects"):
+        with pytest.raises(
+            ValueError, match="Invalid request: batch items must be JSON objects"
+        ):
             parse_json_rpc_message(data)
 
     def test_parse_missing_jsonrpc(self):
@@ -131,11 +140,7 @@ class TestResponseCreation:
         """Test creating success response."""
         response_json = create_success_response(1, {"data": "test"})
         response = json.loads(response_json)
-        expected = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "result": {"data": "test"}
-        }
+        expected = {"jsonrpc": "2.0", "id": 1, "result": {"data": "test"}}
         assert response == expected
 
     def test_create_error_response_minimal(self):
@@ -145,10 +150,7 @@ class TestResponseCreation:
         expected = {
             "jsonrpc": "2.0",
             "id": 1,
-            "error": {
-                "code": -32600,
-                "message": "Invalid Request"
-            }
+            "error": {"code": -32600, "message": "Invalid Request"},
         }
         assert response == expected
 
@@ -164,8 +166,8 @@ class TestResponseCreation:
             "error": {
                 "code": -32602,
                 "message": "Invalid params",
-                "data": {"field": "missing"}
-            }
+                "data": {"field": "missing"},
+            },
         }
         assert response == expected
 
