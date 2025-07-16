@@ -1,4 +1,4 @@
-"""JSON-RPC 2.0 protocol handling for MCP communication."""
+"""JSON-RPC 2.0 protocol handling for MCP communication with batch request support."""
 
 import json
 from dataclasses import dataclass

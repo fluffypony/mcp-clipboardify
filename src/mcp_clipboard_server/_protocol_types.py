@@ -7,6 +7,9 @@ except ImportError:
     # Python 3.7 compatibility
     from typing_extensions import TypedDict
 
+# Import JsonRpcError from protocol module
+from .protocol import JsonRpcError
+
 
 # Basic types
 JsonRpcId = Union[str, int, None]
@@ -94,8 +97,16 @@ class ToolCallResult(TypedDict):
     content: List[TextContent]
 
 
+# JSON-RPC error type
+class JsonRpcError(TypedDict):
+    """JSON-RPC 2.0 error object."""
+    code: int
+    message: str
+    data: Optional[Any]
+
+
 # JSON-RPC message types - using dataclass versions from protocol.py
-# JsonRpcRequest, JsonRpcError, JsonRpcResponse are defined in protocol.py as dataclasses
+# JsonRpcRequest, JsonRpcResponse are defined in protocol.py as dataclasses
 
 class JsonRpcNotification(TypedDict):
     """JSON-RPC 2.0 notification message (no id field)."""

@@ -25,7 +25,8 @@ python -m mcp_clipboard_server
 ## ✨ Features
 
 - **Cross-platform clipboard access** - Works on Windows, macOS, and Linux with platform-specific fallback handling
-- **MCP protocol compliance** - Full JSON-RPC 2.0 over STDIO implementation
+- **MCP protocol compliance** - Full JSON-RPC 2.0 over STDIO implementation with batch request support
+- **JSON Schema validation** - Comprehensive parameter validation with detailed error messages
 - **Two core tools**:
   - `get_clipboard` - Retrieve current clipboard content
   - `set_clipboard` - Set clipboard to provided text
@@ -115,6 +116,60 @@ The server uses JSON-RPC 2.0 over STDIO. Here are example request/response patte
   }
 }
 ```
+
+#### Batch Requests (JSON-RPC 2.0)
+The server supports batch requests for processing multiple operations in a single call:
+```json
+[
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "get_clipboard",
+      "arguments": {}
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/call",
+    "params": {
+      "name": "set_clipboard",
+      "arguments": {
+        "text": "Batch operation result"
+      }
+    }
+  }
+]
+```
+
+## 🔧 JSON-RPC 2.0 Compliance
+
+This server implements full JSON-RPC 2.0 specification with the following features:
+
+### Supported Features
+- ✅ **Single requests** - Standard request/response pattern
+- ✅ **Batch requests** - Process multiple requests in one call
+- ✅ **Notifications** - Fire-and-forget messages (e.g., `$/ping`)
+- ✅ **Error handling** - Comprehensive error codes and messages
+- ✅ **Parameter validation** - JSON Schema-based validation with detailed error reports
+
+### Schema Validation
+All tool parameters are validated against JSON schemas with helpful error messages:
+- **Type validation** - Ensures parameters are correct types
+- **Required fields** - Validates all required parameters are present
+- **Size limits** - Enforces 1MB text size limit for clipboard operations
+- **Additional properties** - Rejects unexpected parameters
+
+### Error Codes
+The server uses standard JSON-RPC 2.0 error codes plus MCP-specific extensions:
+- `-32700` Parse error (invalid JSON)
+- `-32600` Invalid Request (malformed JSON-RPC)
+- `-32601` Method not found
+- `-32602` Invalid params (schema validation failures)
+- `-32603` Internal error
+- `-32000` Server error (MCP-specific errors)
 
 ### Integration with MCP Clients
 
