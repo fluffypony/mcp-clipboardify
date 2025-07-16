@@ -9,8 +9,8 @@ def pytest_configure(config):
     )
 
 
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(config, items):  # pylint: disable=unused-argument
     """Modify test items to ensure serial tests run without conflicts."""
     # When running with pytest-xdist, warn about clipboard test conflicts
     # The serial marker helps identify tests that may conflict in parallel
-    pass  # Serial marker is now mainly for documentation/identification
+    # Currently used for documentation/identification purposes only
