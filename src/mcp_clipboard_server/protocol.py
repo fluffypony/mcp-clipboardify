@@ -71,6 +71,37 @@ class ErrorCodes:
     SERVER_ERROR = -32000  # MCP server error
 
 
+def _validate_json_rpc_object(obj: dict) -> None:
+    """Validate a single JSON-RPC object."""
+    if obj.get("jsonrpc") != "2.0":
+        raise ValueError("Invalid request: jsonrpc must be '2.0'")
+    
+    if "method" not in obj:
+        raise ValueError("Invalid request: missing method")
+
+
+def _parse_batch_request(parsed: list) -> List[JsonRpcRequest]:
+    """Parse a batch JSON-RPC request."""
+    if not parsed:  # Empty batch not allowed
+        raise ValueError("Invalid request: empty batch")
+    
+    requests = []
+    for item in parsed:
+        if not isinstance(item, dict):
+            raise ValueError("Invalid request: batch items must be JSON objects")
+        
+        _validate_json_rpc_object(item)
+        requests.append(JsonRpcRequest.from_dict(item))
+    
+    return requests
+
+
+def _parse_single_request(parsed: dict) -> JsonRpcRequest:
+    """Parse a single JSON-RPC request."""
+    _validate_json_rpc_object(parsed)
+    return JsonRpcRequest.from_dict(parsed)
+
+
 def parse_json_rpc_message(data: str) -> Union[JsonRpcRequest, List[JsonRpcRequest]]:
     """
     Parse a JSON-RPC 2.0 message from string.
@@ -91,37 +122,13 @@ def parse_json_rpc_message(data: str) -> Union[JsonRpcRequest, List[JsonRpcReque
     
     # Check if it's a batch request (array)
     if isinstance(parsed, list):
-        if not parsed:  # Empty batch not allowed
-            raise ValueError("Invalid request: empty batch")
-        
-        requests = []
-        for item in parsed:
-            if not isinstance(item, dict):
-                raise ValueError("Invalid request: batch items must be JSON objects")
-            
-            # Validate required fields for each item
-            if item.get("jsonrpc") != "2.0":
-                raise ValueError("Invalid request: jsonrpc must be '2.0'")
-            
-            if "method" not in item:
-                raise ValueError("Invalid request: missing method")
-            
-            requests.append(JsonRpcRequest.from_dict(item))
-        
-        return requests
+        return _parse_batch_request(parsed)
     
     # Single request
     if not isinstance(parsed, dict):
         raise ValueError("Invalid request: must be JSON object")
     
-    # Validate required fields
-    if parsed.get("jsonrpc") != "2.0":
-        raise ValueError("Invalid request: jsonrpc must be '2.0'")
-    
-    if "method" not in parsed:
-        raise ValueError("Invalid request: missing method")
-    
-    return JsonRpcRequest.from_dict(parsed)
+    return _parse_single_request(parsed)
 
 
 def create_success_response(request_id: Optional[Union[str, int]], result: Any) -> str:

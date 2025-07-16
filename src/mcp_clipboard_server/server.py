@@ -118,6 +118,70 @@ class MCPServer:
         return create_batch_response(responses)
 
 
+def _read_stdin_line(shutdown_event: threading.Event | None = None) -> str | None:
+    """Read a line from stdin with shutdown checking."""
+    try:
+        line = sys.stdin.readline()
+        if not line:  # EOF
+            logger.info("Received EOF, shutting down")
+            return None
+        
+        line = line.strip()
+        if not line:  # Empty line
+            return ""
+        
+        logger.debug(f"Received: {line}")
+        return line
+        
+    except (KeyboardInterrupt, EOFError):
+        logger.info("Received interrupt or EOF, shutting down")
+        return None
+
+
+def _send_response(response: str) -> None:
+    """Send response to stdout with error handling."""
+    if response is not None:
+        logger.debug(f"Sending: {response}")
+        sys.stdout.write(response + '\n')
+        sys.stdout.flush()  # Critical for STDIO communication
+
+
+def _send_error_response(error_code: int, message: str) -> None:
+    """Send error response with exception handling."""
+    try:
+        error_response = create_error_response(None, error_code, message)
+        sys.stdout.write(error_response + '\n')
+        sys.stdout.flush()
+    except Exception as write_error:
+        logger.error(f"Failed to send error response: {write_error}")
+
+
+def _process_request(server: MCPServer, line: str) -> None:
+    """Process a single request line."""
+    try:
+        parsed = parse_json_rpc_message(line)
+        
+        # Check if it's a batch request or single request
+        if isinstance(parsed, list):
+            response = server.handle_batch_requests(parsed)
+        else:
+            response = server.handle_request(parsed)
+        
+        _send_response(response)
+        
+    except ValidationException as e:
+        logger.error(f"Validation error: {e}")
+        _send_error_response(ErrorCodes.INVALID_PARAMS, str(e))
+        
+    except ValueError as e:
+        logger.error(f"Parse error: {e}")
+        _send_error_response(ErrorCodes.PARSE_ERROR, str(e))
+        
+    except Exception as e:
+        logger.error(f"Unexpected error processing request: {e}", exc_info=True)
+        _send_error_response(ErrorCodes.INTERNAL_ERROR, "Internal server error")
+
+
 def run_server(shutdown_event: threading.Event | None = None):
     """
     Run the MCP server main loop.
@@ -140,76 +204,15 @@ def run_server(shutdown_event: threading.Event | None = None):
                 logger.info("Shutdown requested, exiting gracefully")
                 break
             
-            # Read line from stdin with timeout to allow checking shutdown event
-            try:
-                line = sys.stdin.readline()
-                if not line:  # EOF
-                    logger.info("Received EOF, shutting down")
-                    break
-                
-                line = line.strip()
-                if not line:  # Empty line
-                    continue
-                
-                logger.debug(f"Received: {line}")
-                
-            except KeyboardInterrupt:
-                logger.info("Received interrupt, shutting down")
+            # Read line from stdin
+            line = _read_stdin_line(shutdown_event)
+            if line is None:  # EOF or interrupt
                 break
-            except EOFError:
-                logger.info("Received EOF, shutting down")
-                break
+            if line == "":  # Empty line
+                continue
             
-            # Parse and handle the request - wrap in comprehensive error handling
-            try:
-                parsed = parse_json_rpc_message(line)
-                
-                # Check if it's a batch request or single request
-                if isinstance(parsed, list):
-                    response = server.handle_batch_requests(parsed)
-                else:
-                    response = server.handle_request(parsed)
-                
-                if response is not None:
-                    logger.debug(f"Sending: {response}")
-                    sys.stdout.write(response + '\n')
-                    sys.stdout.flush()  # Critical for STDIO communication
-                    
-            except ValidationException as e:
-                # Enhanced validation error handling (for tool params, etc.)
-                logger.error(f"Validation error: {e}")
-                try:
-                    error_response = create_error_response(
-                        None, ErrorCodes.INVALID_PARAMS, str(e)
-                    )
-                    sys.stdout.write(error_response + '\n')
-                    sys.stdout.flush()
-                except Exception as write_error:
-                    logger.error(f"Failed to send validation error response: {write_error}")
-                    
-            except ValueError as e:
-                # JSON parsing or other validation error - recoverable
-                logger.error(f"Parse error: {e}")
-                try:
-                    error_response = create_error_response(
-                        None, ErrorCodes.PARSE_ERROR, str(e)
-                    )
-                    sys.stdout.write(error_response + '\n')
-                    sys.stdout.flush()
-                except Exception as write_error:
-                    logger.error(f"Failed to send error response: {write_error}")
-                
-            except Exception as e:
-                # Unexpected error - recoverable, log and continue
-                logger.error(f"Unexpected error processing request: {e}", exc_info=True)
-                try:
-                    error_response = create_error_response(
-                        None, ErrorCodes.INTERNAL_ERROR, "Internal server error"
-                    )
-                    sys.stdout.write(error_response + '\n')
-                    sys.stdout.flush()
-                except Exception as write_error:
-                    logger.error(f"Failed to send error response: {write_error}")
+            # Process the request
+            _process_request(server, line)
     
     except Exception as e:
         logger.error(f"Fatal error in server loop: {e}", exc_info=True)
