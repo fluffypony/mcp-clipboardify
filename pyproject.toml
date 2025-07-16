@@ -45,3 +45,9 @@ mcp-clipboard-server = "mcp_clipboard_server.__main__:main"
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fluffypony/mcp-clipboardify/issues"
 "Changelog" = "https://github.com/fluffypony/mcp-clipboardify/blob/main/CHANGELOG.md"
+
+# Repository configuration for PyPI publishing
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/legacy/"
+priority = "explicit"
