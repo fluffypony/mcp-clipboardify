@@ -18,27 +18,33 @@ logger = logging.getLogger(__name__)
 def _get_platform_info() -> str:
     """Get detailed platform information for error messages."""
     system = platform.system()
+
+    # Handle Linux variants
     if system == "Linux":
+        # Check for WSL first
         if os.path.exists("/proc/version"):
             try:
                 with open("/proc/version", "r", encoding="utf-8") as f:
                     version = f.read().strip()
                     if "Microsoft" in version or "WSL" in version:
                         return "WSL (Windows Subsystem for Linux)"
-            except Exception:
+            except (IOError, OSError):
                 pass
 
         # Check for Wayland environment
         if "WAYLAND_DISPLAY" in os.environ:
             return "Linux (Wayland)"
-        if "DISPLAY" not in os.environ:
-            return "Linux (headless)"
-        return "Linux (X11)"
-    if system == "Darwin":
-        return "macOS"
-    if system == "Windows":
-        return "Windows"
-    return f"{system} (unsupported)"
+
+        # Check for headless or X11
+        return "Linux (headless)" if "DISPLAY" not in os.environ else "Linux (X11)"
+
+    # Handle other platforms
+    platform_map = {
+        "Darwin": "macOS",
+        "Windows": "Windows",
+    }
+
+    return platform_map.get(system, f"{system} (unsupported)")
 
 
 def _get_platform_guidance(error_msg: str) -> str:
@@ -53,46 +59,65 @@ def _get_platform_guidance(error_msg: str) -> str:
             "2. Install wslu package for clip.exe integration "
             "3. Use Windows Terminal or enable clipboard sharing"
         )
+
+    # Handle Linux variants
     if "Linux" in platform_info:
-        if "headless" in platform_info:
-            return (
+        error_lower = error_msg.lower()
+
+        # Platform-specific Linux guidance
+        linux_guidance = {
+            "headless": (
                 "Clipboard access requires a display server. "
                 "On headless Linux systems, clipboard operations are not supported."
-            )
-        if "Wayland" in platform_info:
-            return (
+            ),
+            "Wayland": (
                 "Wayland clipboard access requires wl-clipboard utilities. Install with: "
                 "sudo apt-get install wl-clipboard (Ubuntu/Debian) or "
                 "sudo dnf install wl-clipboard (Fedora) or "
                 "sudo pacman -S wl-clipboard (Arch). "
                 "If wl-clipboard is installed, ensure compositor supports clipboard sharing."
-            )
-        if "xclip" in error_msg.lower() or "xsel" in error_msg.lower():
+            ),
+        }
+
+        # Check for exact platform variant matches
+        for variant, guidance in linux_guidance.items():
+            if variant in platform_info:
+                return guidance
+
+        # Check for error-specific patterns
+        if "xclip" in error_lower or "xsel" in error_lower:
             return (
                 "Missing clipboard utilities. Install with: "
                 "sudo apt-get install xclip xsel (Ubuntu/Debian) or "
                 "sudo yum install xclip xsel (RHEL/CentOS) or "
                 "sudo pacman -S xclip xsel (Arch)"
             )
-        elif "display" in error_msg.lower():
+
+        if "display" in error_lower:
             return (
                 "No display available. Ensure DISPLAY environment variable is set "
                 "or run in a desktop environment."
             )
-    elif "macOS" in platform_info:
-        return (
+
+    # Platform-specific guidance mapping
+    guidance_map = {
+        "macOS": (
             "macOS clipboard access failed. This may be due to: "
             "1. Security permissions (check System Preferences > Privacy) "
             "2. Running in a sandboxed environment "
             "3. Insufficient user privileges"
-        )
-    elif "Windows" in platform_info:
-        return (
+        ),
+        "Windows": (
             "Windows clipboard access failed. This may be due to: "
             "1. Another application holding clipboard lock "
             "2. Insufficient user privileges "
             "3. Antivirus software blocking access"
-        )
+        ),
+    }
+
+    for platform_name, guidance in guidance_map.items():
+        if platform_name in platform_info:
+            return guidance
 
     return f"Platform-specific guidance not available for {platform_info}"
 
@@ -159,7 +184,7 @@ def get_clipboard() -> str:
     try:
         content = pyperclip.paste()
         return content if content is not None else ""
-    except Exception as e:
+    except (OSError, RuntimeError, ImportError) as e:
         error_msg = str(e)
         platform_info = _get_platform_info()
 
@@ -210,7 +235,7 @@ def set_clipboard(text: str) -> None:
     try:
         pyperclip.copy(text)
         logger.debug("Successfully set clipboard content: %s characters", len(text))
-    except Exception as e:
+    except (OSError, RuntimeError, ImportError) as e:
         error_msg = str(e)
         platform_info = _get_platform_info()
 

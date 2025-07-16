@@ -9,9 +9,9 @@ from .protocol import (
     parse_json_rpc_message,
     create_error_response,
     create_batch_response,
-    ErrorCodes,
     JsonRpcRequest,
 )
+from ._errors import ErrorCodes
 from ._mcp_handler import MCPHandler
 from ._logging_config import setup_logging, log_request, log_response
 from ._errors import create_error_response_for_exception
@@ -76,7 +76,12 @@ class MCPServer:
             JSON response string, or None for notifications.
         """
         # Log the incoming request
-        log_request(logger, request.method, request.params, str(request.id) if request.id is not None else None)
+        log_request(
+            logger,
+            request.method,
+            request.params,
+            str(request.id) if request.id is not None else None,
+        )
 
         try:
             # Delegate to MCP handler
@@ -84,11 +89,16 @@ class MCPServer:
 
             # Log successful response
             if response is not None:
-                log_response(logger, request.method, True, str(request.id) if request.id is not None else None)
+                log_response(
+                    logger,
+                    request.method,
+                    True,
+                    str(request.id) if request.id is not None else None,
+                )
 
             return response
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # Log error response
             log_response(
                 logger,
@@ -118,7 +128,7 @@ class MCPServer:
             try:
                 response = self.handle_request(request)
                 responses.append(response)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 # Error handling for individual batch items
                 error_response = create_error_response_for_exception(request.id, e)
                 responses.append(error_response)
@@ -162,7 +172,7 @@ def _send_error_response(error_code: int, message: str) -> None:
         error_response = create_error_response(None, error_code, message)
         sys.stdout.write(error_response + "\n")
         sys.stdout.flush()
-    except Exception as write_error:
+    except Exception as write_error:  # pylint: disable=broad-exception-caught
         logger.error("Failed to send error response: %s", write_error)
 
 
@@ -187,7 +197,7 @@ def _process_request(server: MCPServer, line: str) -> None:
         logger.error("Parse error: %s", e)
         _send_error_response(ErrorCodes.PARSE_ERROR, str(e))
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logger.error("Unexpected error processing request: %s", e, exc_info=True)
         _send_error_response(ErrorCodes.INTERNAL_ERROR, "Internal server error")
 

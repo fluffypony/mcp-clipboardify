@@ -6,11 +6,11 @@ from mcp_clipboard_server.protocol import (
     JsonRpcRequest,
     JsonRpcError,
     JsonRpcResponse,
-    ErrorCodes,
     parse_json_rpc_message,
     create_success_response,
     create_error_response,
 )
+from mcp_clipboard_server._errors import ErrorCodes
 
 
 class TestJsonRpcRequest:

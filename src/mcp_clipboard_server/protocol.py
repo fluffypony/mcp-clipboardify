@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, List
 
 
+
+
 @dataclass
 class JsonRpcRequest:
     """JSON-RPC 2.0 request message."""
@@ -58,18 +60,6 @@ class JsonRpcResponse:
         else:
             response["result"] = self.result
         return response
-
-
-# Standard JSON-RPC error codes
-class ErrorCodes:  # pylint: disable=too-few-public-methods
-    """Standard JSON-RPC 2.0 error codes."""
-
-    PARSE_ERROR = -32700
-    INVALID_REQUEST = -32600
-    METHOD_NOT_FOUND = -32601
-    INVALID_PARAMS = -32602
-    INTERNAL_ERROR = -32603
-    SERVER_ERROR = -32000  # MCP server error
 
 
 def _validate_json_rpc_object(obj: dict) -> None:

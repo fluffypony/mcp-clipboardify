@@ -91,7 +91,7 @@ def main(args: list[str] | None = None) -> NoReturn:
     except KeyboardInterrupt:
         logger.info("Received keyboard interrupt, shutting down")
         sys.exit(0)
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
         logger.error("Fatal error: %s", e, exc_info=True)
         sys.exit(1)
 

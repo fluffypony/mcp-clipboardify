@@ -11,7 +11,7 @@ from mcp_clipboard_server.tools import (
 )
 from mcp_clipboard_server._tool_schemas import get_all_tool_definitions
 from mcp_clipboard_server.clipboard import ClipboardError
-from mcp_clipboard_server.protocol import ErrorCodes
+from mcp_clipboard_server._errors import ErrorCodes
 
 
 class TestToolDefinitions:

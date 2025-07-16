@@ -3,8 +3,9 @@
 import logging
 from typing import Any, Dict
 
-from .clipboard import get_clipboard, set_clipboard, ClipboardError
-from .protocol import ErrorCodes
+from .clipboard import ClipboardError
+from ._clipboard_utils import execute_get_clipboard, execute_set_clipboard
+from ._errors import ErrorCodes
 from ._tool_schemas import (
     get_all_tool_definitions,
     validate_tool_exists,
@@ -84,22 +85,11 @@ def execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         if tool_name == "get_clipboard":
-            content = get_clipboard()
-            logger.debug("Retrieved clipboard content: %s characters", len(content))
-            return {"content": [{"type": "text", "text": content}]}
+            return execute_get_clipboard()
 
         if tool_name == "set_clipboard":
             text = params["text"]
-            set_clipboard(text)
-            logger.debug("Set clipboard content: %s characters", len(text))
-            return {
-                "content": [
-                    {
-                        "type": "text",
-                        "text": f"Successfully copied {len(text)} characters to clipboard",
-                    }
-                ]
-            }
+            return execute_set_clipboard(text)
 
     except ClipboardError as e:
         logger.error("Clipboard operation failed: %s", e)

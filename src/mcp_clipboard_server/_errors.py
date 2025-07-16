@@ -133,7 +133,7 @@ def safe_execute(request_id: Any, operation: Callable[..., Any], *args, **kwargs
         # Create success response locally to avoid circular import
         response = {"jsonrpc": "2.0", "id": request_id, "result": result}
         return json.dumps(response)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         return create_error_response_for_exception(request_id, e)
 
 
@@ -195,19 +195,19 @@ def get_error_code_for_exception(exception: Exception) -> int:
 
     # Check for exact type match first
     if exception_type in EXCEPTION_TO_ERROR_CODE:
-        error_code = EXCEPTION_TO_ERROR_CODE[exception_type]
+        error_code_or_func = EXCEPTION_TO_ERROR_CODE[exception_type]
         # Handle callable mappings
-        if callable(error_code):
-            return error_code(exception)
-        return error_code
+        if callable(error_code_or_func):
+            return error_code_or_func(exception)  # pylint: disable=not-callable
+        return error_code_or_func
 
     # Check for inheritance (e.g., custom ValueError subclasses)
-    for exc_type, error_code in EXCEPTION_TO_ERROR_CODE.items():
+    for exc_type, error_code_or_func in EXCEPTION_TO_ERROR_CODE.items():
         if isinstance(exception, exc_type):
             # Handle callable mappings
-            if callable(error_code):
-                return error_code(exception)
-            return error_code
+            if callable(error_code_or_func):
+                return error_code_or_func(exception)  # pylint: disable=not-callable
+            return error_code_or_func
 
     # Default to internal error for unknown exceptions
     logger.warning("Unknown exception type: %s", exception_type.__name__)

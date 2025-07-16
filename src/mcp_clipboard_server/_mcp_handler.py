@@ -12,17 +12,17 @@ from ._protocol_types import (
 )
 from .protocol import (
     JsonRpcRequest,
-    ErrorCodes,
     create_success_response,
     create_error_response,
 )
+from ._errors import ErrorCodes
 from ._tool_schemas import (
     get_all_tool_definitions,
     validate_tool_exists,
     get_tool_schema,
 )
 from ._validators import validate_with_json_schema
-from .clipboard import get_clipboard, set_clipboard
+from ._clipboard_utils import execute_get_clipboard, execute_set_clipboard
 from ._errors import safe_execute
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,6 @@ class MCPHandler:
             None (notifications don't get responses).
         """
         logger.debug("Received ping notification")
-        return None
 
     def _execute_tool(
         self, tool_name: str, arguments: Dict[str, Any]
@@ -209,24 +208,11 @@ class MCPHandler:
         validate_with_json_schema(arguments, dict(schema))
 
         if tool_name == "get_clipboard":
-            content = get_clipboard()
-            logger.debug("Retrieved clipboard content: %s characters", len(content))
-
-            return {"content": [{"type": "text", "text": content}]}
+            return execute_get_clipboard()
 
         if tool_name == "set_clipboard":
             text = arguments["text"]
-            set_clipboard(text)
-            logger.debug("Set clipboard content: %s characters", len(text))
-
-            return {
-                "content": [
-                    {
-                        "type": "text",
-                        "text": f"Successfully copied {len(text)} characters to clipboard",
-                    }
-                ]
-            }
+            return execute_set_clipboard(text)
 
         # This should not happen if validate_tool_exists was called
         raise ValueError(f"Unknown tool: {tool_name}")

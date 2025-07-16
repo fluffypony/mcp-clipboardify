@@ -115,10 +115,12 @@ def get_logger_with_request_id(
     """
     logger = logging.getLogger(name)
 
-    class RequestIDAdapter(logging.LoggerAdapter[logging.Logger]):
+    class RequestIDAdapter(logging.LoggerAdapter[logging.Logger]):  # pylint: disable=too-few-public-methods
         """Logger adapter that adds request ID to log records."""
 
-        def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> Tuple[Any, MutableMapping[str, Any]]:
+        def process(
+            self, msg: Any, kwargs: MutableMapping[str, Any]
+        ) -> Tuple[Any, MutableMapping[str, Any]]:
             """Add request ID to log record."""
             # Add request_id as extra data
             extra = kwargs.get("extra", {})
