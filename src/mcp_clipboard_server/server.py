@@ -3,11 +3,11 @@
 import sys
 import logging
 import threading
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Union
 
 from .protocol import (
     parse_json_rpc_message, create_success_response, create_error_response,
-    ErrorCodes, JsonRpcRequest
+    create_batch_response, ErrorCodes, JsonRpcRequest
 )
 from ._mcp_handler import MCPHandler
 from ._logging_config import setup_logging, log_request, log_response
@@ -54,6 +54,30 @@ class MCPServer:
             
             # Create error response for exception
             return create_error_response_for_exception(request.id, e)
+    
+    def handle_batch_requests(self, requests: List[JsonRpcRequest]) -> Optional[str]:
+        """
+        Handle a batch of JSON-RPC requests.
+        
+        Args:
+            requests: List of parsed JSON-RPC requests.
+            
+        Returns:
+            JSON batch response string, or None if all were notifications.
+        """
+        logger.info(f"Processing batch request with {len(requests)} items")
+        
+        responses = []
+        for request in requests:
+            try:
+                response = self.handle_request(request)
+                responses.append(response)
+            except Exception as e:
+                # Error handling for individual batch items
+                error_response = create_error_response_for_exception(request.id, e)
+                responses.append(error_response)
+        
+        return create_batch_response(responses)
 
 
 def run_server(shutdown_event: threading.Event | None = None):
@@ -100,8 +124,13 @@ def run_server(shutdown_event: threading.Event | None = None):
             
             # Parse and handle the request - wrap in comprehensive error handling
             try:
-                request = parse_json_rpc_message(line)
-                response = server.handle_request(request)
+                parsed = parse_json_rpc_message(line)
+                
+                # Check if it's a batch request or single request
+                if isinstance(parsed, list):
+                    response = server.handle_batch_requests(parsed)
+                else:
+                    response = server.handle_request(parsed)
                 
                 if response is not None:
                     logger.debug(f"Sending: {response}")
