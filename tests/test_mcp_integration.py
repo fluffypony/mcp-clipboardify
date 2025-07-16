@@ -26,11 +26,13 @@ class MCPIntegrationTest(unittest.TestCase):
         """Clean up after each test."""
         if self.server_process:
             self.server_process.terminate()
-            try:
-                self.server_process.wait()  # asyncio subprocess doesn't have timeout parameter
-            except Exception:
+            # Give the process a moment to terminate gracefully
+            import time
+            time.sleep(0.1)
+            if self.server_process.returncode is None:
                 self.server_process.kill()
-                self.server_process.wait()
+            # Clear the reference to prevent further cleanup issues
+            self.server_process = None
 
     async def start_server(self) -> tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """

@@ -15,6 +15,24 @@ from mcp_clipboard_server.clipboard import (
 )
 
 
+@pytest.fixture(autouse=True)
+def clear_clipboard():
+    """Clear clipboard before and after each test to ensure test isolation."""
+    # Clear clipboard before test
+    try:
+        set_clipboard("")
+    except (ClipboardError, Exception):
+        pass  # Ignore errors during cleanup
+    
+    yield
+    
+    # Clear clipboard after test
+    try:
+        set_clipboard("")
+    except (ClipboardError, Exception):
+        pass  # Ignore errors during cleanup
+
+
 # Platform test cases with different content types
 PLATFORM_TEST_CASES = {
     "Windows": ["ascii", "unicode", "crlf_endings"],
