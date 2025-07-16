@@ -5,17 +5,43 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "mcp-clipboard-server"
 version = "0.1.0"
-description = "MCP server providing clipboard access tools"
-authors = ["Your Name <your.email@example.com>"]
+description = "MCP server providing clipboard access tools for AI assistants and automation workflows"
+authors = ["MCP Clipboard Server Contributors"]
+maintainers = ["MCP Clipboard Server Contributors"]
 readme = "README.md"
+homepage = "https://github.com/fluffypony/mcp-clipboardify"
+repository = "https://github.com/fluffypony/mcp-clipboardify"
+documentation = "https://github.com/fluffypony/mcp-clipboardify/blob/main/README.md"
+license = "MIT"
+keywords = ["mcp", "clipboard", "ai", "automation", "json-rpc", "tools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: System Shells",
+    "Topic :: Utilities",
+]
 packages = [{include = "mcp_clipboard_server", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.8"
 pyperclip = "^1.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
 
 [tool.poetry.scripts]
 mcp-clipboard-server = "mcp_clipboard_server.__main__:main"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/fluffypony/mcp-clipboardify/issues"
+"Changelog" = "https://github.com/fluffypony/mcp-clipboardify/blob/main/CHANGELOG.md"

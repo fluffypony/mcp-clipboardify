@@ -7,6 +7,12 @@ import sys
 import threading
 from typing import NoReturn
 
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    # Python < 3.8 fallback
+    from importlib_metadata import version, PackageNotFoundError
+
 from .logging_config import configure_third_party_loggers, setup_logging
 from .server import run_server
 
@@ -29,6 +35,14 @@ def setup_signal_handlers() -> None:
         signal.signal(signal.SIGTERM, signal_handler)
 
 
+def get_package_version() -> str:
+    """Get package version from metadata."""
+    try:
+        return version("mcp-clipboard-server")
+    except PackageNotFoundError:
+        return "0.1.0"  # Fallback version
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Create command-line argument parser."""
     parser = argparse.ArgumentParser(
@@ -49,7 +63,7 @@ Environment Variables:
     parser.add_argument(
         "--version",
         action="version",
-        version="%(prog)s 0.1.0"  # TODO: Get from package metadata
+        version=f"%(prog)s {get_package_version()}"
     )
     
     return parser
