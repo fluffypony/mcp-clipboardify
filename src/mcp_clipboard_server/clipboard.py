@@ -3,6 +3,7 @@
 import logging
 import os
 import platform
+import subprocess
 import pyperclip
 from typing import Optional
 from ._validators import validate_clipboard_text, ValidationException
@@ -28,9 +29,14 @@ def _get_platform_info() -> str:
                         return "WSL (Windows Subsystem for Linux)"
             except Exception:
                 pass
-        if "DISPLAY" not in os.environ:
+        
+        # Check for Wayland environment
+        if "WAYLAND_DISPLAY" in os.environ:
+            return "Linux (Wayland)"
+        elif "DISPLAY" not in os.environ:
             return "Linux (headless)"
-        return "Linux"
+        else:
+            return "Linux (X11)"
     elif system == "Darwin":
         return "macOS"
     elif system == "Windows":
@@ -56,6 +62,14 @@ def _get_platform_guidance(error_msg: str) -> str:
             return (
                 "Clipboard access requires a display server. "
                 "On headless Linux systems, clipboard operations are not supported."
+            )
+        elif "Wayland" in platform_info:
+            return (
+                "Wayland clipboard access requires wl-clipboard utilities. Install with: "
+                "sudo apt-get install wl-clipboard (Ubuntu/Debian) or "
+                "sudo dnf install wl-clipboard (Fedora) or "
+                "sudo pacman -S wl-clipboard (Arch). "
+                "If wl-clipboard is installed, ensure compositor supports clipboard sharing."
             )
         elif "xclip" in error_msg.lower() or "xsel" in error_msg.lower():
             return (
@@ -87,6 +101,46 @@ def _get_platform_guidance(error_msg: str) -> str:
     return f"Platform-specific guidance not available for {platform_info}"
 
 
+def _try_wayland_clipboard_get() -> Optional[str]:
+    """Try to get clipboard content using Wayland wl-clipboard tools."""
+    try:
+        result = subprocess.run(
+            ["wl-paste"], 
+            capture_output=True, 
+            text=True, 
+            timeout=5
+        )
+        if result.returncode == 0:
+            return result.stdout
+        else:
+            logger.debug(f"wl-paste failed with return code {result.returncode}: {result.stderr}")
+            return None
+    except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError) as e:
+        logger.debug(f"Wayland clipboard get failed: {e}")
+        return None
+
+
+def _try_wayland_clipboard_set(text: str) -> bool:
+    """Try to set clipboard content using Wayland wl-clipboard tools."""
+    try:
+        result = subprocess.run(
+            ["wl-copy"], 
+            input=text, 
+            text=True, 
+            capture_output=True, 
+            timeout=5
+        )
+        if result.returncode == 0:
+            logger.debug("Successfully set clipboard using wl-copy")
+            return True
+        else:
+            logger.debug(f"wl-copy failed with return code {result.returncode}: {result.stderr}")
+            return False
+    except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError) as e:
+        logger.debug(f"Wayland clipboard set failed: {e}")
+        return False
+
+
 def get_clipboard() -> str:
     """
     Get the current contents of the system clipboard with platform-specific fallback handling.
@@ -104,6 +158,15 @@ def get_clipboard() -> str:
     except Exception as e:
         error_msg = str(e)
         platform_info = _get_platform_info()
+        
+        # Try Wayland fallback on Linux systems
+        if "Linux" in platform_info and "WAYLAND_DISPLAY" in os.environ:
+            logger.debug("Attempting Wayland clipboard fallback for get operation")
+            wayland_content = _try_wayland_clipboard_get()
+            if wayland_content is not None:
+                logger.info("Successfully retrieved clipboard content using Wayland fallback")
+                return wayland_content
+        
         guidance = _get_platform_guidance(error_msg)
         
         # Log detailed error information for debugging
@@ -142,6 +205,14 @@ def set_clipboard(text: str) -> None:
     except Exception as e:
         error_msg = str(e)
         platform_info = _get_platform_info()
+        
+        # Try Wayland fallback on Linux systems
+        if "Linux" in platform_info and "WAYLAND_DISPLAY" in os.environ:
+            logger.debug("Attempting Wayland clipboard fallback for set operation")
+            if _try_wayland_clipboard_set(text):
+                logger.info("Successfully set clipboard content using Wayland fallback")
+                return
+        
         guidance = _get_platform_guidance(error_msg)
         
         # Log detailed error information
