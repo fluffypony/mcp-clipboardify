@@ -76,7 +76,7 @@ class MCPServer:
             JSON response string, or None for notifications.
         """
         # Log the incoming request
-        log_request(logger, request.method, request.params, request.id)
+        log_request(logger, request.method, request.params, str(request.id) if request.id is not None else None)
 
         try:
             # Delegate to MCP handler
@@ -84,7 +84,7 @@ class MCPServer:
 
             # Log successful response
             if response is not None:
-                log_response(logger, request.method, True, request.id)
+                log_response(logger, request.method, True, str(request.id) if request.id is not None else None)
 
             return response
 
@@ -94,7 +94,7 @@ class MCPServer:
                 logger,
                 request.method,
                 False,
-                request.id,
+                str(request.id) if request.id is not None else None,
                 getattr(e, "error_code", ErrorCodes.INTERNAL_ERROR),
             )
 
@@ -148,7 +148,7 @@ def _read_stdin_line(
         return None
 
 
-def _send_response(response: str) -> None:
+def _send_response(response: Optional[str]) -> None:
     """Send response to stdout with error handling."""
     if response is not None:
         logger.debug("Sending: %s", response)

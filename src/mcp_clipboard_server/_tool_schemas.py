@@ -1,11 +1,11 @@
 """JSON Schema definitions for MCP tool input parameters."""
 
 from typing import Dict, Any, List
-from ._protocol_types import ToolDefinition
+from ._protocol_types import ToolDefinition, ToolInputSchema
 
 
 # Schema for get_clipboard tool (no parameters)
-GET_CLIPBOARD_SCHEMA: Dict[str, Any] = {
+GET_CLIPBOARD_SCHEMA: ToolInputSchema = {
     "type": "object",
     "properties": {},
     "required": [],
@@ -13,7 +13,7 @@ GET_CLIPBOARD_SCHEMA: Dict[str, Any] = {
 }
 
 # Schema for set_clipboard tool
-SET_CLIPBOARD_SCHEMA: Dict[str, Any] = {
+SET_CLIPBOARD_SCHEMA: ToolInputSchema = {
     "type": "object",
     "properties": {
         "text": {
@@ -41,7 +41,7 @@ TOOL_DEFINITIONS: Dict[str, ToolDefinition] = {
 }
 
 
-def get_tool_schema(tool_name: str) -> Dict[str, Any]:
+def get_tool_schema(tool_name: str) -> ToolInputSchema:
     """
     Get the JSON schema for a specific tool.
 

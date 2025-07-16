@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Union, Tuple, MutableMapping
 from datetime import datetime
 
 
@@ -51,7 +51,7 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(log_entry, ensure_ascii=False)
 
 
-def setup_logging(log_level: str = None) -> None:
+def setup_logging(log_level: Optional[str] = None) -> None:
     """
     Configure logging for the MCP server.
 
@@ -85,7 +85,7 @@ def setup_logging(log_level: str = None) -> None:
     use_json = os.getenv("MCP_LOG_JSON", "false").lower() in ("true", "1", "yes")
 
     if use_json:
-        formatter = JSONFormatter()
+        formatter: Union[JSONFormatter, logging.Formatter] = JSONFormatter()
     else:
         formatter = logging.Formatter(
             fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -101,8 +101,8 @@ def setup_logging(log_level: str = None) -> None:
 
 
 def get_logger_with_request_id(
-    name: str, request_id: str = None
-) -> logging.LoggerAdapter:
+    name: str, request_id: Optional[str] = None
+) -> logging.LoggerAdapter[logging.Logger]:
     """
     Get a logger adapter that includes request ID in all log messages.
 
@@ -115,14 +115,14 @@ def get_logger_with_request_id(
     """
     logger = logging.getLogger(name)
 
-    class RequestIDAdapter(logging.LoggerAdapter):
+    class RequestIDAdapter(logging.LoggerAdapter[logging.Logger]):
         """Logger adapter that adds request ID to log records."""
 
-        def process(self, msg, kwargs):
+        def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> Tuple[Any, MutableMapping[str, Any]]:
             """Add request ID to log record."""
             # Add request_id as extra data
             extra = kwargs.get("extra", {})
-            if self.extra.get("request_id"):
+            if self.extra and self.extra.get("request_id"):
                 extra["request_id"] = self.extra["request_id"]
             kwargs["extra"] = extra
             return msg, kwargs
@@ -131,7 +131,7 @@ def get_logger_with_request_id(
 
 
 def log_request(
-    logger: logging.Logger, method: str, params: Any = None, request_id: str = None
+    logger: logging.Logger, method: str, params: Any = None, request_id: Optional[str] = None
 ) -> None:
     """
     Log an incoming request.
@@ -142,7 +142,7 @@ def log_request(
         params: Request parameters.
         request_id: Request ID for correlation.
     """
-    extra_fields = {"request_method": method, "request_id": request_id}
+    extra_fields: Dict[str, Any] = {"request_method": method, "request_id": request_id}
 
     if params is not None:
         # Don't log sensitive parameters like clipboard content
@@ -175,8 +175,8 @@ def log_response(
     logger: logging.Logger,
     method: str,
     success: bool,
-    request_id: str = None,
-    error_code: int = None,
+    request_id: Optional[str] = None,
+    error_code: Optional[int] = None,
 ) -> None:
     """
     Log a response.
@@ -188,7 +188,7 @@ def log_response(
         request_id: Request ID for correlation.
         error_code: Error code if request failed.
     """
-    extra_fields = {
+    extra_fields: Dict[str, Any] = {
         "response_method": method,
         "response_success": success,
         "request_id": request_id,

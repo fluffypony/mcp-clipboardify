@@ -52,7 +52,7 @@ class JsonRpcResponse:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert response to dictionary."""
-        response = {"jsonrpc": self.jsonrpc, "id": self.id}
+        response: Dict[str, Any] = {"jsonrpc": self.jsonrpc, "id": self.id}
         if self.error is not None:
             response["error"] = self.error.to_dict()
         else:

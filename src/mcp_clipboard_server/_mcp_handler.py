@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class MCPHandler:
     """MCP protocol handler for processing MCP-specific requests."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the MCP handler."""
         self.initialized = False
         self.client_info: Optional[Dict[str, Any]] = None
@@ -185,6 +185,7 @@ class MCPHandler:
             None (notifications don't get responses).
         """
         logger.debug("Received ping notification")
+        return None
 
     def _execute_tool(
         self, tool_name: str, arguments: Dict[str, Any]
@@ -205,7 +206,7 @@ class MCPHandler:
         """
         # Validate arguments against tool schema
         schema = get_tool_schema(tool_name)
-        validate_with_json_schema(arguments, schema)
+        validate_with_json_schema(arguments, dict(schema))
 
         if tool_name == "get_clipboard":
             content = get_clipboard()

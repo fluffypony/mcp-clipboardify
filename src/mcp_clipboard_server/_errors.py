@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Dict, Type, Any
+from typing import Dict, Type, Any, Optional, Callable, Union
 from ._validators import ValidationException
 
 
@@ -60,7 +60,7 @@ ERROR_MESSAGES: Dict[int, str] = {
 
 
 # Exception to error code mapping
-EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], int] = {
+EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], Union[int, Callable[[Exception], int]]] = {
     ValueError: MCPErrorCodes.INVALID_PARAMS,
     ValidationException: MCPErrorCodes.INVALID_PARAMS,
     ClipboardError: MCPErrorCodes.CLIPBOARD_ERROR,
@@ -71,7 +71,7 @@ EXCEPTION_TO_ERROR_CODE: Dict[Type[Exception], int] = {
 }
 
 
-def get_error_message(error_code: int, custom_message: str = None) -> str:
+def get_error_message(error_code: int, custom_message: Optional[str] = None) -> str:
     """
     Get a human-readable error message for an error code.
 
@@ -114,7 +114,7 @@ def create_error_response_for_exception(request_id: Any, exception: Exception) -
     return json.dumps(response)
 
 
-def safe_execute(request_id: Any, operation: callable, *args, **kwargs) -> str:
+def safe_execute(request_id: Any, operation: Callable[..., Any], *args, **kwargs) -> str:
     """
     Safely execute an operation and return appropriate response.
 
@@ -169,7 +169,7 @@ class ValidationError(MCPError):
 # Update exception mapping to include custom exceptions
 EXCEPTION_TO_ERROR_CODE.update(
     {
-        MCPError: lambda e: e.error_code,
+        MCPError: lambda e: getattr(e, 'error_code', MCPErrorCodes.SERVER_ERROR),
         InitializationError: MCPErrorCodes.INITIALIZATION_ERROR,
         ValidationError: MCPErrorCodes.VALIDATION_ERROR,
     }
@@ -204,6 +204,9 @@ def get_error_code_for_exception(exception: Exception) -> int:
     # Check for inheritance (e.g., custom ValueError subclasses)
     for exc_type, error_code in EXCEPTION_TO_ERROR_CODE.items():
         if isinstance(exception, exc_type):
+            # Handle callable mappings
+            if callable(error_code):
+                return error_code(exception)
             return error_code
 
     # Default to internal error for unknown exceptions
