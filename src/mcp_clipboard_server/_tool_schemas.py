@@ -1,8 +1,8 @@
 """JSON Schema definitions for MCP tool input parameters."""
 
 from typing import Dict, List
-from ._protocol_types import ToolDefinition, ToolInputSchema
 
+from ._protocol_types import ToolDefinition, ToolInputSchema
 
 # Schema for get_clipboard tool (no parameters)
 GET_CLIPBOARD_SCHEMA: ToolInputSchema = {

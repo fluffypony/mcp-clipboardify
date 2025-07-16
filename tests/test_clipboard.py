@@ -1,8 +1,9 @@
 """Tests for clipboard module."""
 
-import pytest
 from unittest.mock import patch
-from mcp_clipboard_server.clipboard import get_clipboard, set_clipboard, ClipboardError
+
+import pytest
+from mcp_clipboard_server.clipboard import ClipboardError, get_clipboard, set_clipboard
 
 
 class TestClipboard:

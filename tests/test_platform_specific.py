@@ -2,16 +2,16 @@
 
 import os
 import platform
-import pytest
 import unittest
 from unittest.mock import patch
 
+import pytest
 from mcp_clipboard_server.clipboard import (
+    ClipboardError,
+    _get_platform_guidance,
+    _get_platform_info,
     get_clipboard,
     set_clipboard,
-    ClipboardError,
-    _get_platform_info,
-    _get_platform_guidance,
 )
 
 

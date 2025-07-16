@@ -1,29 +1,29 @@
 """MCP-specific request handler extending JSON-RPC base functionality."""
 
 import logging
-from typing import Dict, Any, Optional, Callable
-from ._version import __version__
+from typing import Any, Callable, Dict, Optional
+
+from ._clipboard_utils import execute_get_clipboard, execute_set_clipboard
+from ._errors import ErrorCodes, safe_execute
 from ._protocol_types import (
     InitializeResult,
-    ToolsListResult,
-    ToolCallResult,
     ServerCapabilities,
     ServerInfo,
+    ToolCallResult,
+    ToolsListResult,
 )
-from .protocol import (
-    JsonRpcRequest,
-    create_success_response,
-    create_error_response,
-)
-from ._errors import ErrorCodes
 from ._tool_schemas import (
     get_all_tool_definitions,
-    validate_tool_exists,
     get_tool_schema,
+    validate_tool_exists,
 )
 from ._validators import validate_with_json_schema
-from ._clipboard_utils import execute_get_clipboard, execute_set_clipboard
-from ._errors import safe_execute
+from ._version import __version__
+from .protocol import (
+    JsonRpcRequest,
+    create_error_response,
+    create_success_response,
+)
 
 logger = logging.getLogger(__name__)
 

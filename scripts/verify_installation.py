@@ -256,8 +256,8 @@ class InstallationVerifier:
         """Test platform detection functionality."""
         try:
             from mcp_clipboard_server.clipboard import (
-                _get_platform_info,
                 _get_platform_guidance,
+                _get_platform_info,
             )
 
             platform_info = _get_platform_info()
@@ -279,7 +279,7 @@ class InstallationVerifier:
     def test_unicode_support(self) -> bool:
         """Test Unicode content handling."""
         try:
-            from mcp_clipboard_server.clipboard import set_clipboard, get_clipboard
+            from mcp_clipboard_server.clipboard import get_clipboard, set_clipboard
 
             # Test with Unicode content
             unicode_text = "Hello, 世界! 🌍 Café naïve résumé"

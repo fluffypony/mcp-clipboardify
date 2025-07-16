@@ -3,9 +3,9 @@
 import json
 from unittest.mock import patch
 
-from mcp_clipboard_server.server import MCPServer
-from mcp_clipboard_server.protocol import JsonRpcRequest
 from mcp_clipboard_server._errors import ErrorCodes
+from mcp_clipboard_server.protocol import JsonRpcRequest
+from mcp_clipboard_server.server import MCPServer
 
 
 class TestMCPServer:

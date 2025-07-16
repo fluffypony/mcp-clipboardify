@@ -1,8 +1,8 @@
 """Input validation utilities for MCP clipboard server."""
 
-from typing import Any, Dict, List, Optional
 import json
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 try:
     import jsonschema

@@ -2,8 +2,8 @@
 
 import logging
 
-from .clipboard import get_clipboard, set_clipboard
 from ._protocol_types import ToolCallResult
+from .clipboard import get_clipboard, set_clipboard
 
 logger = logging.getLogger(__name__)
 

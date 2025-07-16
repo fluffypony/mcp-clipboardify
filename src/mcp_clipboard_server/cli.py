@@ -9,10 +9,10 @@ import threading
 from typing import NoReturn
 
 try:
-    from importlib.metadata import version, PackageNotFoundError
+    from importlib.metadata import PackageNotFoundError, version
 except ImportError:
     # Python < 3.8 fallback
-    from importlib_metadata import version, PackageNotFoundError  # type: ignore
+    from importlib_metadata import PackageNotFoundError, version  # type: ignore
 
 from ._logging_config import configure_third_party_loggers, setup_logging
 from .server import run_server

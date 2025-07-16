@@ -2,7 +2,8 @@
 
 import json
 import logging
-from typing import Dict, Type, Any, Optional, Callable, Union
+from typing import Any, Callable, Dict, Optional, Type, Union
+
 from ._validators import ValidationException
 
 

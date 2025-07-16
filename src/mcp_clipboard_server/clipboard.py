@@ -9,7 +9,7 @@ from typing import Optional
 import pyperclip
 
 from ._errors import ClipboardError
-from ._validators import validate_clipboard_text, ValidationException
+from ._validators import ValidationException, validate_clipboard_text
 
 # Configure logging
 logger = logging.getLogger(__name__)

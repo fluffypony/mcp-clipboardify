@@ -4,9 +4,10 @@ import json
 import subprocess
 import sys
 import time
+from typing import Any, Dict, Optional
+
 import pyperclip
 import pytest
-from typing import Dict, Any, Optional
 
 
 class MCPIntegrationTest:

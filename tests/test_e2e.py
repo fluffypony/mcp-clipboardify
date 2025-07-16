@@ -5,8 +5,9 @@ import subprocess
 import sys
 import time
 from typing import Any, Dict, Optional
-import pytest
+
 import pyperclip
+import pytest
 
 
 class MCPServerProcess:

@@ -1,11 +1,11 @@
 """Logging configuration for MCP clipboard server."""
 
+import json
 import logging
 import os
 import sys
-import json
-from typing import Any, Dict, Optional, Union, Tuple, MutableMapping
 from datetime import datetime
+from typing import Any, Dict, MutableMapping, Optional, Tuple, Union
 
 
 class JSONFormatter(logging.Formatter):

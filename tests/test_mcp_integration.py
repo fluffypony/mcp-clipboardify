@@ -3,11 +3,12 @@
 import asyncio
 import json
 import os
-import pytest
 import sys
 import unittest
-from typing import Any, Dict
 import uuid
+from typing import Any, Dict
+
+import pytest
 
 
 class MCPIntegrationTest(unittest.TestCase):
