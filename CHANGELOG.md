@@ -60,7 +60,7 @@ This is the first production release of the MCP Clipboard Server, providing comp
 #### Package Management
 - **PyPI Ready**: Complete metadata with classifiers and dependencies
 - **Poetry Support**: Modern Python packaging with lock file management
-- **Entry Points**: Both `mcp-clipboard-server` command and `python -m` module execution
+- **Entry Points**: Both `mcp-clipboardify` command and `python -m` module execution
 - **Installation Verification**: Automated scripts for testing installation correctness
 
 #### Documentation

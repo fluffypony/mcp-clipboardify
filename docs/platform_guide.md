@@ -22,7 +22,7 @@ This guide provides detailed platform-specific instructions for installing and c
 
 #### Option 1: Using pip (Recommended)
 ```cmd
-pip install mcp-clipboard-server
+pip install mcp-clipboardify
 ```
 
 #### Option 2: Using Poetry
@@ -30,7 +30,7 @@ pip install mcp-clipboard-server
 git clone https://github.com/fluffypony/mcp-clipboardify
 cd mcp-clipboardify
 poetry install
-poetry run mcp-clipboard-server
+poetry run mcp-clipboardify
 ```
 
 ### Configuration
@@ -38,14 +38,14 @@ poetry run mcp-clipboard-server
 #### Basic Usage
 ```cmd
 # Start the server
-mcp-clipboard-server
+mcp-clipboardify
 
 # Or using Python module
 python -m mcp_clipboard_server
 
 # With debug logging
 set MCP_LOG_LEVEL=DEBUG
-mcp-clipboard-server
+mcp-clipboardify
 ```
 
 #### Enterprise Environments
@@ -59,11 +59,11 @@ If running in a corporate environment with restricted permissions:
 #### PowerShell Integration
 ```powershell
 # Install using PowerShell
-pip install mcp-clipboard-server
+pip install mcp-clipboardify
 
 # Start with environment variables
 $env:MCP_LOG_LEVEL = "DEBUG"
-mcp-clipboard-server
+mcp-clipboardify
 ```
 
 ### Troubleshooting
@@ -110,13 +110,13 @@ set PYTHONIOENCODING=utf-8
 brew install python
 
 # Install MCP Clipboard Server
-pip3 install mcp-clipboard-server
+pip3 install mcp-clipboardify
 ```
 
 #### Option 2: Using system Python
 ```bash
 # Install using system Python (requires pip)
-python3 -m pip install --user mcp-clipboard-server
+python3 -m pip install --user mcp-clipboardify
 ```
 
 #### Option 3: Using Poetry
@@ -124,7 +124,7 @@ python3 -m pip install --user mcp-clipboard-server
 git clone https://github.com/fluffypony/mcp-clipboardify
 cd mcp-clipboardify
 poetry install
-poetry run mcp-clipboard-server
+poetry run mcp-clipboardify
 ```
 
 ### Configuration
@@ -141,7 +141,7 @@ macOS may require additional permissions:
 ```bash
 # Add to ~/.zshrc or ~/.bash_profile
 export MCP_LOG_LEVEL=DEBUG
-alias mcp-clipboard="mcp-clipboard-server"
+alias mcp-clipboard="mcp-clipboardify"
 
 # For better Unicode support
 export LANG=en_US.UTF-8
@@ -194,10 +194,10 @@ sudo apt-get update
 sudo apt-get install python3 python3-pip xclip xsel
 
 # Install MCP Clipboard Server
-pip3 install --user mcp-clipboard-server
+pip3 install --user mcp-clipboardify
 
 # Or system-wide (requires sudo)
-sudo pip3 install mcp-clipboard-server
+sudo pip3 install mcp-clipboardify
 ```
 
 #### RHEL/CentOS/Fedora
@@ -209,7 +209,7 @@ sudo yum install python3 python3-pip xclip xsel
 sudo dnf install python3 python3-pip xclip xsel
 
 # Install MCP Clipboard Server
-pip3 install --user mcp-clipboard-server
+pip3 install --user mcp-clipboardify
 ```
 
 #### Arch Linux
@@ -218,7 +218,7 @@ pip3 install --user mcp-clipboard-server
 sudo pacman -S python python-pip xclip xsel
 
 # Install from AUR (if available) or pip
-pip install --user mcp-clipboard-server
+pip install --user mcp-clipboardify
 ```
 
 #### Alpine Linux
@@ -227,7 +227,7 @@ pip install --user mcp-clipboard-server
 sudo apk add python3 py3-pip xclip xsel
 
 # Install MCP Clipboard Server
-pip3 install --user mcp-clipboard-server
+pip3 install --user mcp-clipboardify
 ```
 
 ### Configuration
@@ -254,7 +254,7 @@ After=graphical-session.target
 Type=simple
 User=your-username
 Environment=DISPLAY=:0
-ExecStart=/home/your-username/.local/bin/mcp-clipboard-server
+ExecStart=/home/your-username/.local/bin/mcp-clipboardify
 Restart=always
 
 [Install]
@@ -323,7 +323,7 @@ which clip.exe
 sudo apt-get install python3 python3-pip
 
 # Install MCP Clipboard Server
-pip3 install --user mcp-clipboard-server
+pip3 install --user mcp-clipboardify
 ```
 
 #### Step 3: Configure WSL
@@ -388,7 +388,7 @@ Clipboard access in containers is limited by design. The MCP Clipboard Server ha
 # Example Dockerfile for testing
 FROM python:3.11-slim
 
-RUN pip install mcp-clipboard-server
+RUN pip install mcp-clipboardify
 
 # For testing without clipboard access
 ENTRYPOINT ["python", "-m", "mcp_clipboard_server"]
@@ -417,7 +417,7 @@ docker run -v /tmp/.X11-unix:/tmp/.X11-unix \
 
 - name: Test MCP Clipboard Server
   run: |
-    pip install mcp-clipboard-server
+    pip install mcp-clipboardify
     python -m mcp_clipboard_server --help
 ```
 
@@ -429,7 +429,7 @@ test_clipboard:
     - export DISPLAY=:99
     - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     - sleep 3
-    - pip install mcp-clipboard-server
+    - pip install mcp-clipboardify
     - python -m mcp_clipboard_server --help
 ```
 
@@ -446,7 +446,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'pip install mcp-clipboard-server'
+                sh 'pip install mcp-clipboardify'
                 sh 'python -m mcp_clipboard_server --help'
             }
         }

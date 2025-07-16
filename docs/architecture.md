@@ -857,7 +857,7 @@ The architecture maintains backwards compatibility through:
 ```toml
 # FROM: pyproject.toml
 [tool.poetry]
-name = "mcp-clipboard-server"
+name = "mcp-clipboardify"
 version = "1.0.0"
 description = "MCP server for clipboard operations"
 

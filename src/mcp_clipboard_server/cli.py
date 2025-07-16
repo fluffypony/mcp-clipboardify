@@ -39,7 +39,7 @@ def setup_signal_handlers() -> None:
 def get_package_version() -> str:
     """Get package version from metadata."""
     try:
-        return version("mcp-clipboard-server")
+        return version("mcp-clipboardify")
     except PackageNotFoundError:
         return "0.1.0"  # Fallback version
 
@@ -47,12 +47,12 @@ def get_package_version() -> str:
 def create_parser() -> argparse.ArgumentParser:
     """Create command-line argument parser."""
     parser = argparse.ArgumentParser(
-        prog="mcp-clipboard-server",
+        prog="mcp-clipboardify",
         description="MCP server providing clipboard access tools",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  mcp-clipboard-server                    # Start the server
+  mcp-clipboardify                    # Start the server
   python -m mcp_clipboard_server          # Alternative startup method
 
 Environment Variables:

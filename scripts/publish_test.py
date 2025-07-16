@@ -165,7 +165,7 @@ def verify_testpypi_installation():
     time.sleep(30)
 
     # Try to install from TestPyPI
-    print(f"Attempting to install mcp-clipboard-server=={version} from TestPyPI...")
+    print(f"Attempting to install mcp-clipboardify=={version} from TestPyPI...")
 
     try:
         # Create a temporary virtual environment for testing
@@ -194,7 +194,7 @@ def verify_testpypi_installation():
                 "https://test.pypi.org/simple/",
                 "--extra-index-url",
                 "https://pypi.org/simple/",
-                f"mcp-clipboard-server=={version}",
+                f"mcp-clipboardify=={version}",
             ]
 
             result = run_command(install_cmd, check=False)
@@ -265,7 +265,7 @@ def main():
     print("Package successfully published and verified on TestPyPI!")
     print("Install with:")
     print(
-        f"pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mcp-clipboard-server=={get_package_version()}"
+        f"pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mcp-clipboardify=={get_package_version()}"
     )
 
 

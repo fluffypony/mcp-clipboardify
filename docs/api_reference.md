@@ -47,7 +47,7 @@ RESPONSE:
   "result": {
     "protocolVersion": "2024-11-05",
     "serverInfo": {
-      "name": "mcp-clipboard-server",
+      "name": "mcp-clipboardify",
       "version": "1.0.0"
     },
     "capabilities": {
@@ -121,7 +121,7 @@ Establishes the MCP session and negotiates protocol version and capabilities.
 **Response:**
 - `protocolVersion` (string): Negotiated protocol version
 - `serverInfo` (object): Server identification
-  - `name` (string): Always `"mcp-clipboard-server"`
+  - `name` (string): Always `"mcp-clipboardify"`
   - `version` (string): Server version
 - `capabilities` (object): Server capabilities
   - `tools` (object): Empty object indicating tool support
@@ -567,7 +567,7 @@ import json
 
 # Start the server
 process = subprocess.Popen(
-    ["mcp-clipboard-server"],
+    ["mcp-clipboardify"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     text=True
@@ -735,7 +735,7 @@ Enable detailed protocol logging:
 ```bash
 export MCP_LOG_LEVEL=DEBUG
 export MCP_LOG_JSON=true  
-mcp-clipboard-server
+mcp-clipboardify
 ```
 
 This provides:

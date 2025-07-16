@@ -180,10 +180,10 @@ os.environ['MCP_LOG_JSON'] = 'true'
 " && poetry run python -m mcp_clipboard_server
 
 # Direct module execution
-poetry run mcp-clipboard-server
+poetry run mcp-clipboardify
 
 # With environment variables
-MCP_LOG_LEVEL=DEBUG MCP_LOG_JSON=true poetry run mcp-clipboard-server
+MCP_LOG_LEVEL=DEBUG MCP_LOG_JSON=true poetry run mcp-clipboardify
 ```
 
 ## Testing Strategy
@@ -681,7 +681,7 @@ export MCP_LOG_LEVEL=DEBUG
 export MCP_LOG_JSON=true
 
 # Run with debug output
-poetry run mcp-clipboard-server 2>debug.log
+poetry run mcp-clipboardify 2>debug.log
 
 # Monitor debug output
 tail -f debug.log

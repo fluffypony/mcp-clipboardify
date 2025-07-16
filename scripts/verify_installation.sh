@@ -5,7 +5,7 @@
 
 set -e
 
-PACKAGE_NAME="${1:-mcp-clipboard-server}"
+PACKAGE_NAME="${1:-mcp-clipboardify}"
 PYTHON_CMD="${PYTHON_CMD:-python3}"
 
 echo "=== MCP Clipboard Server Installation Verification ==="

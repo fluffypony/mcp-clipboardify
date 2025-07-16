@@ -51,7 +51,7 @@ class MCPHandler:
         Returns:
             ServerInfo dictionary.
         """
-        return {"name": "mcp-clipboard-server", "version": __version__}
+        return {"name": "mcp-clipboardify", "version": __version__}
 
     def get_server_capabilities(self) -> ServerCapabilities:
         """

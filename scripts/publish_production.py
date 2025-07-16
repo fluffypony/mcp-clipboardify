@@ -233,7 +233,7 @@ def check_package_availability():
         import requests
 
         response = requests.get(
-            f"https://pypi.org/pypi/mcp-clipboard-server/{version}/json", timeout=10
+            f"https://pypi.org/pypi/mcp-clipboardify/{version}/json", timeout=10
         )
         if response.status_code == 200:
             print(f"Error: Version {version} already exists on PyPI")
@@ -318,11 +318,11 @@ def verify_pypi_installation():
                 python_path = venv_dir / "bin" / "python"
 
             # Install from PyPI
-            print(f"Installing mcp-clipboard-server=={version} from PyPI...")
+            print(f"Installing mcp-clipboardify=={version} from PyPI...")
             install_cmd = [
                 str(pip_path),
                 "install",
-                f"mcp-clipboard-server=={version}",
+                f"mcp-clipboardify=={version}",
                 "--no-cache-dir",
             ]
 
@@ -391,7 +391,7 @@ def main():
     # Final confirmation
     version = get_package_version()
     print("\n=== Ready to Publish ===")
-    print("Package: mcp-clipboard-server")
+    print("Package: mcp-clipboardify")
     print(f"Version: {version}")
     print("Target: https://pypi.org/")
 
@@ -414,9 +414,9 @@ def main():
         sys.exit(1)
 
     print("\n=== Publishing Complete ===")
-    print(f"✅ Successfully published mcp-clipboard-server {version} to PyPI!")
-    print(f"📦 Install with: pip install mcp-clipboard-server=={version}")
-    print(f"🔗 Package URL: https://pypi.org/project/mcp-clipboard-server/{version}/")
+    print(f"✅ Successfully published mcp-clipboardify {version} to PyPI!")
+    print(f"📦 Install with: pip install mcp-clipboardify=={version}")
+    print(f"🔗 Package URL: https://pypi.org/project/mcp-clipboardify/{version}/")
 
     # Cleanup
     response = input("\nClean up build artifacts? [Y/n]: ")

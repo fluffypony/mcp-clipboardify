@@ -4,7 +4,7 @@ import importlib.metadata
 
 try:
     # Try to get version from package metadata
-    __version__ = importlib.metadata.version("mcp-clipboard-server")
+    __version__ = importlib.metadata.version("mcp-clipboardify")
 except importlib.metadata.PackageNotFoundError:
     # Fallback version if package not installed
     __version__ = "1.0.0-dev"

@@ -2,8 +2,8 @@
 
 A [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.io/) server that provides clipboard access tools for AI assistants and automation workflows. Seamlessly integrate clipboard operations into your AI-powered applications.
 
-[![PyPI version](https://badge.fury.io/py/mcp-clipboard-server.svg)](https://badge.fury.io/py/mcp-clipboard-server)
-[![Python Support](https://img.shields.io/pypi/pyversions/mcp-clipboard-server.svg)](https://pypi.org/project/mcp-clipboard-server/)
+[![PyPI version](https://badge.fury.io/py/mcp-clipboardify.svg)](https://badge.fury.io/py/mcp-clipboardify)
+[![Python Support](https://img.shields.io/pypi/pyversions/mcp-clipboardify.svg)](https://pypi.org/project/mcp-clipboardify/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🚀 Quick Start
@@ -11,13 +11,13 @@ A [Model Context Protocol (MCP)](https://spec.modelcontextprotocol.io/) server t
 Install the server:
 
 ```bash
-pip install mcp-clipboard-server
+pip install mcp-clipboardify
 ```
 
 Start the server:
 
 ```bash
-mcp-clipboard-server
+mcp-clipboardify
 # or alternatively:
 python -m mcp_clipboard_server
 ```
@@ -181,7 +181,7 @@ import json
 
 # Start the server
 process = subprocess.Popen(
-    ["mcp-clipboard-server"],
+    ["mcp-clipboardify"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     text=True
@@ -236,7 +236,7 @@ No additional setup required - clipboard access works out of the box.
 ### Install from PyPI
 
 ```bash
-pip install mcp-clipboard-server
+pip install mcp-clipboardify
 ```
 
 ### Install from Source
@@ -420,7 +420,7 @@ Enable debug logging:
 # Set environment variable for detailed logs
 export MCP_LOG_LEVEL=DEBUG
 export MCP_LOG_JSON=true
-mcp-clipboard-server
+mcp-clipboardify
 ```
 
 ### Getting Help
@@ -437,7 +437,7 @@ After installation, verify everything works:
 
 ```bash
 # Quick verification
-mcp-clipboard-server --help
+mcp-clipboardify --help
 
 # Comprehensive verification (requires download)
 curl -sSL https://raw.githubusercontent.com/fluffypony/mcp-clipboardify/main/scripts/verify_installation.sh | bash

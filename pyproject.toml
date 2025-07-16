@@ -3,7 +3,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "mcp-clipboard-server"
+name = "mcp-clipboardify"
 version = "1.0.0"
 description = "MCP server providing clipboard access tools for AI assistants and automation workflows"
 authors = ["MCP Clipboard Server Contributors"]
@@ -53,7 +53,7 @@ radon = "6.0.0,<7.0.0"
 pre-commit = "3.5.0,<4.0.0"
 
 [tool.poetry.scripts]
-mcp-clipboard-server = "mcp_clipboard_server.__main__:main"
+mcp-clipboardify = "mcp_clipboard_server.__main__:main"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fluffypony/mcp-clipboardify/issues"

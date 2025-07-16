@@ -36,10 +36,10 @@ python3 --version  # Should be 3.8+
 python3 -c "import mcp_clipboard_server; print(mcp_clipboard_server.__version__)"
 
 # 3. Check CLI entry point
-mcp-clipboard-server --help
+mcp-clipboardify --help
 
 # 4. Check basic MCP protocol
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | timeout 5 mcp-clipboard-server
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | timeout 5 mcp-clipboardify
 ```
 
 ## Platform-Specific Issues
@@ -292,7 +292,7 @@ wsl --terminate Ubuntu-20.04
 ```bash
 # Enable debug logging
 export MCP_LOG_LEVEL=DEBUG
-mcp-clipboard-server
+mcp-clipboardify
 
 # Check platform-specific requirements
 python3 -c "from mcp_clipboard_server.clipboard import _get_platform_info; print(_get_platform_info())"
@@ -322,7 +322,7 @@ time echo "test" | pbcopy                      # macOS
 
 # Profile MCP server
 export MCP_LOG_LEVEL=DEBUG
-mcp-clipboard-server  # Watch for timing information
+mcp-clipboardify  # Watch for timing information
 ```
 
 **Solutions:**
@@ -339,8 +339,8 @@ mcp-clipboard-server  # Watch for timing information
 **Diagnosis:**
 ```bash
 # Monitor memory usage
-ps aux | grep mcp-clipboard-server
-top -p $(pgrep -f mcp-clipboard-server)
+ps aux | grep mcp-clipboardify
+top -p $(pgrep -f mcp-clipboardify)
 
 # Check for memory leaks
 valgrind python3 -m mcp_clipboard_server  # Linux only
@@ -361,7 +361,7 @@ export MCP_LOG_LEVEL=DEBUG
 export MCP_LOG_JSON=true
 
 # Run with debug output
-mcp-clipboard-server 2> debug.log
+mcp-clipboardify 2> debug.log
 
 # Analyze logs
 tail -f debug.log
@@ -371,13 +371,13 @@ tail -f debug.log
 
 ```bash
 # Using strace (Linux)
-strace -e trace=read,write -o strace.log mcp-clipboard-server
+strace -e trace=read,write -o strace.log mcp-clipboardify
 
 # Using dtruss (macOS)
-sudo dtruss -t read,write mcp-clipboard-server
+sudo dtruss -t read,write mcp-clipboardify
 
 # Manual JSON-RPC testing
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | mcp-clipboard-server
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | mcp-clipboardify
 ```
 
 ### Python Debugging
@@ -536,7 +536,7 @@ if __name__ == "__main__":
 ## Environment
 - OS: [e.g., Ubuntu 22.04, Windows 11, macOS 13.0]
 - Python Version: [output of python3 --version]
-- Package Version: [output of pip show mcp-clipboard-server]
+- Package Version: [output of pip show mcp-clipboardify]
 - Terminal: [e.g., bash, PowerShell, iTerm2]
 
 ## Issue Description
@@ -557,7 +557,7 @@ if __name__ == "__main__":
 ```bash
 # Include output from:
 export MCP_LOG_LEVEL=DEBUG
-mcp-clipboard-server 2> debug.log
+mcp-clipboardify 2> debug.log
 # ... reproduce issue ...
 cat debug.log
 ```

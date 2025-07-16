@@ -18,7 +18,7 @@ class TestMCPServer:
     def test_initialization(self):
         """Test server initialization state."""
         assert not self.server.initialized
-        assert self.server.server_info["name"] == "mcp-clipboard-server"
+        assert self.server.server_info["name"] == "mcp-clipboardify"
         assert "tools" in self.server.capabilities
 
     def test_handle_initialize(self):
@@ -193,7 +193,7 @@ class TestMCPServer:
         init_response = self.server.handle_request(init_request)
         assert (
             json.loads(init_response)["result"]["serverInfo"]["name"]
-            == "mcp-clipboard-server"
+            == "mcp-clipboardify"
         )
 
         # 2. List tools

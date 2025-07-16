@@ -11,7 +11,7 @@ from typing import Optional
 class InstallationVerifier:
     """Verify MCP Clipboard Server installation and functionality."""
 
-    def __init__(self, package_name: str = "mcp-clipboard-server"):
+    def __init__(self, package_name: str = "mcp-clipboardify"):
         self.package_name = package_name
         self.test_results = []
         self.temp_dir = None
@@ -413,8 +413,8 @@ def main():
     )
     parser.add_argument(
         "--package-name",
-        default="mcp-clipboard-server",
-        help="Package name to verify (default: mcp-clipboard-server)",
+        default="mcp-clipboardify",
+        help="Package name to verify (default: mcp-clipboardify)",
     )
     parser.add_argument("--report", help="Save detailed report to file")
     parser.add_argument("--quiet", action="store_true", help="Reduce output verbosity")

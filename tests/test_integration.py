@@ -118,7 +118,7 @@ def test_mcp_handshake():
         assert init_response["id"] == 1
         assert "result" in init_response
         assert "serverInfo" in init_response["result"]
-        assert init_response["result"]["serverInfo"]["name"] == "mcp-clipboard-server"
+        assert init_response["result"]["serverInfo"]["name"] == "mcp-clipboardify"
         assert "capabilities" in init_response["result"]
 
         # 2. List tools

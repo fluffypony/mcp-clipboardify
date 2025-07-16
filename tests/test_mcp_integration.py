@@ -153,7 +153,7 @@ class MCPIntegrationTest(unittest.TestCase):
         self.assertIn("capabilities", result)
 
         server_info = result["serverInfo"]
-        self.assertEqual(server_info["name"], "mcp-clipboard-server")
+        self.assertEqual(server_info["name"], "mcp-clipboardify")
         self.assertIn("version", server_info)
 
         # Test tools/list
