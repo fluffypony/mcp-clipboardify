@@ -39,6 +39,10 @@ pyperclip = "^1.8.2"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.0"
 pytest-timeout = "^2.1.0"
+flake8 = "^6.1.0"
+black = "^23.11.0"
+isort = "^5.12.0"
+mypy = "^1.6.0"
 
 [tool.poetry.scripts]
 mcp-clipboard-server = "mcp_clipboard_server.__main__:main"
