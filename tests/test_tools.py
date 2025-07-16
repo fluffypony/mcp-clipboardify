@@ -232,7 +232,8 @@ class TestPlatformSpecificIntegration:
 
         with patch("mcp_clipboard_server._clipboard_utils.set_clipboard") as mock_set:
             with patch(
-                "mcp_clipboard_server._clipboard_utils.get_clipboard", return_value=unicode_text
+                "mcp_clipboard_server._clipboard_utils.get_clipboard",
+                return_value=unicode_text,
             ):
                 # Test setting Unicode content
                 result = execute_tool("set_clipboard", {"text": unicode_text})

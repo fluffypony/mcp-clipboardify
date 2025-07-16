@@ -342,7 +342,7 @@ class TestEdgeCases:
         with patch("mcp_clipboard_server.clipboard.pyperclip.copy") as mock_copy:
             with patch("mcp_clipboard_server.clipboard.pyperclip.paste") as mock_paste:
                 mock_paste.return_value = long_content
-                
+
                 try:
                     set_clipboard(long_content)
                     result = get_clipboard()
