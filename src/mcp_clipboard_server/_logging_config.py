@@ -133,7 +133,10 @@ def get_logger_with_request_id(
 
 
 def log_request(
-    logger: logging.Logger, method: str, params: Any = None, request_id: Optional[str] = None
+    logger: logging.Logger,
+    method: str,
+    params: Any = None,
+    request_id: Optional[str] = None,
 ) -> None:
     """
     Log an incoming request.

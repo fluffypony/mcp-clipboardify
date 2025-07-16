@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, List
 
 
-
-
 @dataclass
 class JsonRpcRequest:
     """JSON-RPC 2.0 request message."""

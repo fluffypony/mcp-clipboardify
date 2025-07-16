@@ -51,7 +51,9 @@ def validate_text_size(text: str, max_bytes: int = 1048576) -> None:
         )
 
 
-def validate_json_structure(data: Any, required_fields: Optional[List[str]] = None) -> None:
+def validate_json_structure(
+    data: Any, required_fields: Optional[List[str]] = None
+) -> None:
     """
     Validate basic JSON structure requirements.
 

@@ -55,7 +55,7 @@ What would make this feature complete? List specific criteria:
 Which platforms should this feature support?
 
 - [ ] Windows
-- [ ] macOS  
+- [ ] macOS
 - [ ] Linux
 - [ ] WSL
 - [ ] All platforms
@@ -86,7 +86,7 @@ How important is this feature to you?
 
 - [ ] Critical - Blocking current workflow
 - [ ] High - Would significantly improve workflow
-- [ ] Medium - Nice to have improvement  
+- [ ] Medium - Nice to have improvement
 - [ ] Low - Minor enhancement
 
 ### 👥 User Impact

@@ -299,13 +299,13 @@ class TestClipboardFallbackHandling:
         set_clipboard(test_content)
 
         # Read clipboard in subprocess
-        script = f'''
+        script = f"""
 import sys
 sys.path.insert(0, "{os.path.dirname(os.path.dirname(__file__))}")
 from mcp_clipboard_server.clipboard import get_clipboard
 content = get_clipboard()
 print(content, end="")
-'''
+"""
 
         try:
             result = subprocess.run(

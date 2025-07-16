@@ -6,6 +6,7 @@ from typing import Any, Dict
 from .clipboard import ClipboardError
 from ._clipboard_utils import execute_get_clipboard, execute_set_clipboard
 from ._errors import ErrorCodes
+from ._protocol_types import ToolCallResult
 from ._tool_schemas import (
     get_all_tool_definitions,
     validate_tool_exists,
@@ -63,7 +64,7 @@ def validate_tool_params(tool_name: str, params: Dict[str, Any]) -> None:
             raise ValueError(f"Unexpected parameters: {list(extra_params)}")
 
 
-def execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+def execute_tool(tool_name: str, params: Dict[str, Any]) -> ToolCallResult:
     """
     Execute a tool with the given parameters.
 
@@ -72,7 +73,7 @@ def execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
         params: Parameters for the tool.
 
     Returns:
-        Dict containing the tool execution result.
+        ToolCallResult containing the tool execution result.
 
     Raises:
         ValueError: If tool name is invalid or parameters are wrong.

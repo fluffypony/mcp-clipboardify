@@ -398,7 +398,7 @@ from mcp_clipboard_server.protocol import handle_request
 try:
     content = get_clipboard()
     print(f"Clipboard content: {repr(content)}")
-    
+
     set_clipboard("test content")
     print("Set clipboard successful")
 except Exception as e:
@@ -419,7 +419,7 @@ import sys
 
 def test_mcp_server():
     """Test basic MCP server functionality."""
-    
+
     # Start server
     process = subprocess.Popen(
         [sys.executable, "-m", "mcp_clipboard_server"],
@@ -428,7 +428,7 @@ def test_mcp_server():
         stderr=subprocess.PIPE,
         text=True
     )
-    
+
     # Send initialize request
     request = {
         "jsonrpc": "2.0",
@@ -440,21 +440,21 @@ def test_mcp_server():
             "clientInfo": {"name": "test", "version": "1.0.0"}
         }
     }
-    
+
     try:
         stdout, stderr = process.communicate(
-            input=json.dumps(request) + "\n", 
+            input=json.dumps(request) + "\n",
             timeout=10
         )
-        
+
         print(f"stdout: {stdout}")
         print(f"stderr: {stderr}")
         print(f"returncode: {process.returncode}")
-        
+
         if stdout:
             response = json.loads(stdout.split('\n')[0])
             print(f"response: {response}")
-            
+
     except Exception as e:
         print(f"Error: {e}")
         process.kill()

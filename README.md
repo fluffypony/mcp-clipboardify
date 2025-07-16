@@ -46,7 +46,7 @@ Retrieves the current text content from the system clipboard.
 
 **Returns:** Current clipboard content as a string
 
-### `set_clipboard` 
+### `set_clipboard`
 Sets the system clipboard to the provided text content.
 
 **Parameters:**
@@ -313,7 +313,7 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 - **Features**: Full Unicode support, CRLF line ending handling
 - **Notes**: May require clipboard access permissions in some enterprise environments
 
-#### ✅ macOS  
+#### ✅ macOS
 - **Requirements**: macOS 10.15+ recommended
 - **Supported**: Intel and Apple Silicon Macs
 - **Features**: Full Unicode support, RTF content fallback to plain text
@@ -321,14 +321,14 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 
 #### ✅ Linux
 - **Requirements**: X11 display server and clipboard utilities
-- **Installation**: 
+- **Installation**:
   ```bash
   # Ubuntu/Debian
   sudo apt-get install xclip xsel
-  
-  # RHEL/CentOS/Fedora  
+
+  # RHEL/CentOS/Fedora
   sudo yum install xclip xsel
-  
+
   # Arch Linux
   sudo pacman -S xclip xsel
   ```
@@ -338,7 +338,7 @@ The MCP Clipboard Server provides comprehensive cross-platform support with inte
 
 #### 🔧 WSL (Windows Subsystem for Linux)
 - **Requirements**: WSL2 with Windows 10 build 19041+
-- **Installation**: 
+- **Installation**:
   ```bash
   sudo apt-get install wslu  # For clip.exe integration
   ```
@@ -359,7 +359,7 @@ The server automatically detects your platform and provides specific guidance wh
 # Missing utilities error
 sudo apt-get install xclip xsel
 
-# No display error  
+# No display error
 export DISPLAY=:0  # or run in desktop environment
 
 # Headless system

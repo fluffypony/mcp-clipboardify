@@ -174,7 +174,7 @@ class MCPHandler:
         # Execute the tool using centralized error handling
         return safe_execute(request.id, self._execute_tool, tool_name, arguments)
 
-    def handle_ping(self, _request: JsonRpcRequest) -> Optional[str]:
+    def handle_ping(self, _request: JsonRpcRequest) -> None:
         """
         Handle $/ping notification.
 

@@ -18,7 +18,7 @@ echo
 run_test() {
     local test_name="$1"
     local test_command="$2"
-    
+
     echo -n "[$test_name] "
     if eval "$test_command" >/dev/null 2>&1; then
         echo "PASS"
@@ -33,7 +33,7 @@ run_test() {
 run_test_with_output() {
     local test_name="$1"
     local test_command="$2"
-    
+
     echo -n "[$test_name] "
     local output
     if output=$(eval "$test_command" 2>&1); then

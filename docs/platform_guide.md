@@ -469,7 +469,7 @@ def test_clipboard_operations():
     if is_ci_environment():
         # Use mock clipboard or skip clipboard-dependent tests
         pytest.skip("Skipping clipboard tests in CI environment")
-    
+
     # Normal clipboard tests
     from mcp_clipboard_server.clipboard import get_clipboard, set_clipboard
     # ... test implementation
