@@ -108,7 +108,7 @@ def test_mcp_handshake():
             "id": 1,
             "method": "initialize",
             "params": {
-                "protocolVersion": "0.8.0",
+                "protocolVersion": "2024-11-05",
                 "clientInfo": {"name": "test-client", "version": "1.0.0"},
             },
         }

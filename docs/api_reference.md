@@ -112,22 +112,21 @@ RESPONSE:
 Establishes the MCP session and negotiates protocol version and capabilities.
 
 **Request Parameters:**
-- `protocolVersion` (string, required): Must be `"2024-11-05"`
+- `protocolVersion` (string, optional): Protocol version (server responds with `"2024-11-05"`)
 - `clientInfo` (object, optional): Client identification
   - `name` (string): Client name
   - `version` (string): Client version
 - `capabilities` (object, optional): Client capabilities (unused by this server)
 
 **Response:**
-- `protocolVersion` (string): Negotiated protocol version
+- `protocolVersion` (string): Always `"2024-11-05"` (server's supported version)
 - `serverInfo` (object): Server identification
   - `name` (string): Always `"mcp-clipboardify"`
   - `version` (string): Server version
 - `capabilities` (object): Server capabilities
   - `tools` (object): Empty object indicating tool support
 
-**Errors:**
-- `-32602` Invalid params: Unsupported protocol version
+**Note:** The server accepts any protocol version from clients and always responds with its supported version `"2024-11-05"`. No validation is performed on the client's protocol version.
 
 ### tools/list
 

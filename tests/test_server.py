@@ -187,7 +187,7 @@ class TestMCPServer:
             jsonrpc="2.0",
             method="initialize",
             id=1,
-            params={"protocolVersion": "0.8.0"},
+            params={"protocolVersion": "2024-11-05"},
         )
 
         init_response = self.server.handle_request(init_request)
