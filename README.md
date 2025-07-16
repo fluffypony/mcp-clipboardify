@@ -24,15 +24,17 @@ python -m mcp_clipboard_server
 
 ## ✨ Features
 
-- **Cross-platform clipboard access** - Works on Windows, macOS, and Linux
+- **Cross-platform clipboard access** - Works on Windows, macOS, and Linux with platform-specific fallback handling
 - **MCP protocol compliance** - Full JSON-RPC 2.0 over STDIO implementation
 - **Two core tools**:
   - `get_clipboard` - Retrieve current clipboard content
   - `set_clipboard` - Set clipboard to provided text
-- **Robust error handling** - Graceful degradation and comprehensive logging
+- **Enhanced error handling** - Platform-specific guidance for troubleshooting clipboard issues
+- **Graceful degradation** - Fails safely with empty string on read errors, detailed error messages on write failures
 - **Size limits** - 1MB text limit to prevent memory issues
 - **Unicode support** - Full UTF-8 support for international text and emoji
 - **Type safety** - Built with TypedDict for reliable protocol compliance
+- **Production ready** - Comprehensive testing across platforms with CI/CD pipeline
 
 ## 📋 Tools
 
@@ -246,22 +248,114 @@ poetry run black src/ tests/
 
 ## 🔍 Troubleshooting
 
-### Common Issues
+### Platform Support
 
-#### "No clipboard support" error on Linux
-**Solution:** Install xclip or xsel:
+The MCP Clipboard Server provides comprehensive cross-platform support with intelligent fallback handling:
+
+#### ✅ Windows
+- **Requirements**: No additional dependencies
+- **Supported**: Windows 10/11, Windows Server 2019+
+- **Features**: Full Unicode support, CRLF line ending handling
+- **Notes**: May require clipboard access permissions in some enterprise environments
+
+#### ✅ macOS  
+- **Requirements**: macOS 10.15+ recommended
+- **Supported**: Intel and Apple Silicon Macs
+- **Features**: Full Unicode support, RTF content fallback to plain text
+- **Notes**: Security permissions may be required (System Preferences > Privacy & Security)
+
+#### ✅ Linux
+- **Requirements**: X11 display server and clipboard utilities
+- **Installation**: 
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get install xclip xsel
+  
+  # RHEL/CentOS/Fedora  
+  sudo yum install xclip xsel
+  
+  # Arch Linux
+  sudo pacman -S xclip xsel
+  ```
+- **Supported Distributions**: Ubuntu, Debian, RHEL, CentOS, Fedora, Arch Linux
+- **Features**: Full Unicode support, headless environment detection
+- **Notes**: Requires DISPLAY environment variable for GUI clipboard access
+
+#### 🔧 WSL (Windows Subsystem for Linux)
+- **Requirements**: WSL2 with Windows 10 build 19041+
+- **Installation**: 
+  ```bash
+  sudo apt-get install wslu  # For clip.exe integration
+  ```
+- **Features**: Clipboard sharing with Windows host
+- **Notes**: Use Windows Terminal or enable clipboard sharing in WSL configuration
+
+#### 🚫 Headless/Server Environments
+- **Behavior**: Graceful degradation - read operations return empty string
+- **Use Case**: Automated testing, CI/CD environments
+- **Notes**: Write operations will fail with descriptive error messages
+
+### Platform-Specific Guidance
+
+The server automatically detects your platform and provides specific guidance when clipboard operations fail:
+
+#### Linux Troubleshooting
 ```bash
-sudo apt-get install xclip
+# Missing utilities error
+sudo apt-get install xclip xsel
+
+# No display error  
+export DISPLAY=:0  # or run in desktop environment
+
+# Headless system
+# Read operations return empty string (graceful)
+# Write operations fail with clear error message
 ```
 
-#### Permission denied errors
-**Solution:** Ensure the process has access to the clipboard system.
+#### WSL Troubleshooting
+```bash
+# Install Windows integration
+sudo apt-get install wslu
 
-#### Large text causing memory issues
-**Solution:** The server enforces a 1MB limit. Split large content into smaller chunks.
+# Enable clipboard sharing in ~/.wslconfig
+[wsl2]
+guiApplications=true
+```
 
-#### Server not responding
-**Solution:** Check that the client is sending proper JSON-RPC 2.0 formatted messages.
+#### macOS Troubleshooting
+```bash
+# Security permissions
+# Go to System Preferences > Privacy & Security > Input Monitoring
+# Add Terminal or your application
+
+# Sandboxed applications
+# May have limited clipboard access
+```
+
+#### Windows Troubleshooting
+```cmd
+REM Antivirus blocking
+REM Add exception for clipboard access
+
+REM Enterprise policies
+REM Check with IT administrator for clipboard permissions
+```
+
+### Common Issues
+
+#### Platform Detection Issues
+**Symptoms**: Unexpected platform-specific errors
+**Solution**: The server automatically detects your environment. Check logs with `MCP_LOG_LEVEL=DEBUG` for detailed platform information.
+
+#### Unicode Content Problems
+**Symptoms**: International text or emoji not displaying correctly
+**Solution**: Ensure your terminal/application supports UTF-8 encoding. The server handles Unicode correctly on all platforms.
+
+#### Large Content Handling
+**Solution**: The server enforces a 1MB limit. Split large content into smaller chunks.
+
+#### Server Not Responding
+**Solution**: Check that the client is sending proper JSON-RPC 2.0 formatted messages.
 
 ### Debugging
 
@@ -276,9 +370,26 @@ mcp-clipboard-server
 
 ### Getting Help
 
+- **Platform Guide**: [Platform-specific setup instructions](docs/platform_guide.md)
+- **Troubleshooting**: [Common issues and solutions](docs/troubleshooting.md)
 - **Issues**: [GitHub Issues](https://github.com/fluffypony/mcp-clipboardify/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/fluffypony/mcp-clipboardify/discussions)
 - **MCP Specification**: [Model Context Protocol](https://spec.modelcontextprotocol.io/)
+
+### Installation Verification
+
+After installation, verify everything works:
+
+```bash
+# Quick verification
+mcp-clipboard-server --help
+
+# Comprehensive verification (requires download)
+curl -sSL https://raw.githubusercontent.com/fluffypony/mcp-clipboardify/main/scripts/verify_installation.sh | bash
+
+# Or with Python script
+python -c "from scripts.verify_installation import InstallationVerifier; InstallationVerifier().run_all_tests()"
+```
 
 ## 📖 Protocol Details
 
